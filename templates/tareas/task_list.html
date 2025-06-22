@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Mis Tareas</h2>
+<a href="{% url 'task-create' %}">+ Nueva tarea</a>
+
+<form method="get">
+    <div>
+        <label for="estado">Estado</label>
+        <select name="estado" id="estado">
+            <option value="">Todos los estados</option>
+            {% for value, display in estados %}
+                <option value="{{ value }}" {% if estado_actual == value %}selected{% endif %}>{{ display }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <label for="prioridad">Prioridad</label>
+        <select name="prioridad" id="prioridad">
+            <option value="">Todas las prioridades</option>
+            {% for value, display in prioridades %}
+                <option value="{{ value }}" {% if prioridad_actual == value %}selected{% endif %}>{{ display }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="button-actions">
+        <button type="submit" class="btn-filter">Filtrar</button>
+        <a href="?" class="btn-clear">Limpiar</a>
+    </div>
+</form>
+
+<div class="task-container">
+    {% if tasks %}
+        <div class="task-grid">
+            {% for task in tasks %}
+            <div class="task-card {% if task.fecha_vencimiento < today %}task-overdue{% elif task.fecha_vencimiento <= soon and task.fecha_vencimiento >= today %}task-due-soon{% endif %}">
+                <div class="task-header">
+                    <h3 class="task-title">
+                        <a href="{% url 'task-detail' task.pk %}">{{ task.nombre }}</a>
+                    </h3>
+                    <div class="task-priority priority-{{ task.prioridad|lower }}">
+                        {{ task.get_prioridad_display }}
+                    </div>
+                </div>
+                
+                <div class="task-details">
+                    <div class="task-status status-{{ task.estado|lower }}">
+                        {{ task.get_estado_display }}
+                    </div>
+                    
+                    <div class="task-due-date">
+                        <i class="fas fa-calendar-alt"></i>
+                        {{ task.fecha_vencimiento|date:"d M Y" }}
+                        {% if task.fecha_hora_vencimiento %}<br><small>({{ task.fecha_hora_vencimiento|date:'d M Y H:i' }})</small>{% endif %}
+                        {% if task.fecha_vencimiento < today %}
+                            <span class="task-due-badge overdue">¡Vencida!</span>
+                        {% elif task.fecha_vencimiento <= soon and task.fecha_vencimiento >= today %}
+                            <span class="task-due-badge due-soon">Próxima a vencer</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="task-actions">
+                    <a href="{% url 'task-update' task.pk %}" class="btn-edit">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                    <a href="{% url 'task-delete' task.pk %}" class="btn-delete">
+                        <i class="fas fa-trash-alt"></i> Eliminar
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-tasks">
+            <i class="fas fa-tasks"></i>
+            <p>No tienes tareas pendientes. ¡Crea una nueva tarea para comenzar!</p>
+            <a href="{% url 'task-create' %}" class="btn-primary">
+                <i class="fas fa-plus"></i> Crear Tarea
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if ('Notification' in window) {
+            Notification.requestPermission().then(function(permission) {
+                if (permission === 'granted') {
+                    var tasks = JSON.parse('{{ tasks_json|safe }}');
+                    tasks.forEach(function(task) {
+                        if (task.fecha_hora_inicio) {
+                            var now = new Date();
+                            var taskTime = new Date(task.fecha_hora_inicio);
+                            if (taskTime > now) {
+                                var timeDiff = taskTime.getTime() - now.getTime();
+                                setTimeout(function() {
+                                    new Notification('Recordatorio de tarea', {
+                                        body: task.nombre + ' empieza ahora!',
+                                        icon: '/static/img/icon.png' // Reemplaza con la ruta a tu icono
+                                    });
+                                }, timeDiff);
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

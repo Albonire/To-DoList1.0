@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{{ task.nombre }}</h2>
+<p><strong>Descripción:</strong> {{ task.descripcion }}</p>
+<p><strong>Estado:</strong> {{ task.get_estado_display }}</p>
+<p><strong>Prioridad:</strong> {{ task.get_prioridad_display }}</p>
+<p><strong>Fecha de vencimiento:</strong> {{ task.fecha_vencimiento }}</p>
+{% if task.fecha_hora_vencimiento %}<p><strong>Fecha y hora de vencimiento:</strong> {{ task.fecha_hora_vencimiento|date:'d M Y H:i' }}</p>{% endif %}
+<a href="{% url 'task-update' task.pk %}">Editar</a> |
+<a href="{% url 'task-delete' task.pk %}">Eliminar</a> |
+<a href="{% url 'task-list' %}">Volver al listado</a>
+{% endblock %}
