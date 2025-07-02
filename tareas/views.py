@@ -5,8 +5,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.utils import timezone
-from .models import Task
-from .forms import TaskForm
+from .models import Task, Schedule
+from .forms import TaskForm, ScheduleForm
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
 
 def register(request):
     if request.method == 'POST':
@@ -88,3 +90,107 @@ class TaskDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_queryset(self):
         return Task.objects.filter(usuario=self.request.user)
+
+class ScheduleView(LoginRequiredMixin, ListView):
+    model = Schedule
+    template_name = 'tareas/schedule.html'
+    context_object_name = 'schedules'
+
+    def get_queryset(self):
+        return Schedule.objects.filter(usuario=self.request.user).order_by('time_slot', 'day')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Organizar datos para el JavaScript
+        schedule_data = {}
+        for schedule in context['schedules']:
+            if schedule.time_slot not in schedule_data:
+                schedule_data[schedule.time_slot] = {}
+            
+            schedule_data[schedule.time_slot][schedule.day] = {
+                'text': schedule.activity_text,
+                'type': schedule.activity_type,
+                'notes': schedule.notes
+            }
+        
+        context['schedule_data_json'] = json.dumps(schedule_data)
+        context['activity_types'] = Schedule.ACTIVITY_TYPES
+        context['days_of_week'] = Schedule.DAYS_OF_WEEK
+        
+        return context
+
+class ScheduleCreateView(LoginRequiredMixin, CreateView):
+    model = Schedule
+    form_class = ScheduleForm
+    template_name = 'tareas/schedule_form.html'
+    success_url = reverse_lazy('schedule')
+
+    def form_valid(self, form):
+        form.instance.usuario = self.request.user
+        return super().form_valid(form)
+
+class ScheduleUpdateView(LoginRequiredMixin, UpdateView):
+    model = Schedule
+    form_class = ScheduleForm
+    template_name = 'tareas/schedule_form.html'
+    success_url = reverse_lazy('schedule')
+
+    def get_queryset(self):
+        return Schedule.objects.filter(usuario=self.request.user)
+
+class ScheduleDeleteView(LoginRequiredMixin, DeleteView):
+    model = Schedule
+    template_name = 'tareas/schedule_confirm_delete.html'
+    success_url = reverse_lazy('schedule')
+
+    def get_queryset(self):
+        return Schedule.objects.filter(usuario=self.request.user)
+
+# Vista API para guardar actividades del horario via AJAX
+@login_required
+def save_schedule_activity(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            time_slot = data.get('time_slot')
+            day = data.get('day')
+            activity_text = data.get('text', '').strip()
+            activity_type = data.get('type', 'other')
+            notes = data.get('notes', '').strip()
+            
+            if not time_slot or not day:
+                return JsonResponse({'error': 'Faltan datos requeridos'}, status=400)
+            
+            # Buscar actividad existente o crear nueva
+            schedule, created = Schedule.objects.get_or_create(
+                usuario=request.user,
+                time_slot=time_slot,
+                day=day,
+                defaults={
+                    'activity_text': activity_text,
+                    'activity_type': activity_type,
+                    'notes': notes
+                }
+            )
+            
+            if not created:
+                # Actualizar actividad existente
+                if not activity_text:
+                    # Si no hay texto, eliminar la actividad
+                    schedule.delete()
+                    return JsonResponse({'status': 'deleted'})
+                else:
+                    schedule.activity_text = activity_text
+                    schedule.activity_type = activity_type
+                    schedule.notes = notes
+                    schedule.save()
+            
+            return JsonResponse({'status': 'success'})
+            
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Datos JSON inválidos'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    
+    return JsonResponse({'error': 'Método no permitido'}, status=405)

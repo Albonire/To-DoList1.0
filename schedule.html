@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horario Zen - Inspiración y Disciplina</title>
+    <!-- Tailwind CSS es útil, pero lo anularemos bastante con CSS personalizado -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <!-- Google Font: Raleway -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- PALETA DE COLORES Y DISEÑO --- */
+        :root {
+            --bg-color: #f4f8f4; /* Verde muy pálido / Blanco roto */
+            --table-bg: #ffffff;
+            --header-bg: #a5d8a5; /* Verde pálido medio */
+            --header-text: #2e4d2e; /* Verde oscuro para texto */
+            --time-col-bg: #c8e6c9; /* Verde más pálido para columna de hora */
+            --time-col-text: #385c38;
+            --border-color: #dcedc8; /* Verde muy claro para bordes */
+            --text-color: #333333;
+            --quote-border: #81c784; /* Verde medio para acento cita */
+            --quote-bg: #e8f5e9; /* Verde muy pálido para fondo cita */
+            --modal-bg: #f8faf8;
+            --button-bg: #81c784;
+            --button-hover-bg: #6aa36a;
+            --button-text: #ffffff;
+            --current-time-bg: #fff9c4; /* Amarillo pálido/dorado suave */
+            --current-time-border: #fbc02d; /* Dorado más fuerte */
+            --current-indicator: #e53935; /* Rojo suave para línea indicadora */
+            --note-indicator-color: #ffa726; /* Naranja suave para indicador nota */
+
+            /* Colores de Actividad (Tonos verdes, beige, gris) */
+            --activity-class-bg: #c8e6c9; --activity-class-border: #a5d8a5;
+            --activity-study-bg: #e0f2f1; --activity-study-border: #b2dfdb; /* Verde azulado pálido */
+            --activity-workout-bg: #dcedc8; --activity-workout-border: #c5e1a5;
+            --activity-meal-bg: #fff8e1; --activity-meal-border: #ffecb3; /* Beige pálido */
+            --activity-routine-bg: #f1f8e9; --activity-routine-border: #dcedc8;
+            --activity-commute-bg: #eceff1; --activity-commute-border: #cfd8dc; /* Gris azulado pálido */
+            --activity-break-bg: #fffde7; --activity-break-border: #fff9c4; /* Amarillo muy pálido */
+            --activity-social-bg: #fbe9e7; --activity-social-border: #ffccbc; /* Melocotón pálido */
+            --activity-review-bg: #e8f5e9; --activity-review-border: #c8e6c9;
+            --activity-open-bg: #fafafa; --activity-open-border: #f5f5f5; /* Gris muy pálido */
+            --activity-other-bg: #f5f5f5; --activity-other-border: #e0e0e0;
+        }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            /* Sutil fondo con patrón japonés Seigaiha */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%23dcedc8' fill-opacity='0.2'%3E%3Cpath fill-rule='evenodd' d='M11 0l5 20H6l5-20zm42 31l5 20H48l5-20zm-30 25l5 20H28l5-20zM73 0l5 20H68l5-20z'%3E%3C/path%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .current-time-slot {
+            background-color: var(--current-time-bg) !important;
+            border: 2px solid var(--current-time-border) !important;
+            position: relative;
+            font-weight: bold;
+            transform: scale(1.01);
+            transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+            z-index: 10; /* Asegurar que esté sobre la línea */
+        }
+
+        .current-time-indicator {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: var(--current-indicator);
+            z-index: 11; /* Sobre el fondo resaltado */
+            box-shadow: 0 1px 3px rgba(229, 57, 53, 0.4);
+        }
+
+        /* Clases de Actividad con variables CSS */
+        .activity-class { background-color: var(--activity-class-bg); border-color: var(--activity-class-border); }
+        .activity-study { background-color: var(--activity-study-bg); border-color: var(--activity-study-border); }
+        .activity-workout { background-color: var(--activity-workout-bg); border-color: var(--activity-workout-border); }
+        .activity-meal { background-color: var(--activity-meal-bg); border-color: var(--activity-meal-border); }
+        .activity-routine { background-color: var(--activity-routine-bg); border-color: var(--activity-routine-border); }
+        .activity-commute { background-color: var(--activity-commute-bg); border-color: var(--activity-commute-border); }
+        .activity-break { background-color: var(--activity-break-bg); border-color: var(--activity-break-border); }
+        .activity-social { background-color: var(--activity-social-bg); border-color: var(--activity-social-border); }
+        .activity-review { background-color: var(--activity-review-bg); border-color: var(--activity-review-border); }
+        .activity-open { background-color: var(--activity-open-bg); border-color: var(--activity-open-border); }
+        .activity-other { background-color: var(--activity-other-bg); border-color: var(--activity-other-border); }
+
+        .table-container {
+             width: 100%;
+             overflow-x: auto;
+             border-radius: 8px; /* Bordes redondeados */
+             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Sombra más suave */
+        }
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            min-width: 900px;
+            background-color: var(--table-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden; /* Para que el radius funcione con sticky */
+        }
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 12px 10px; /* Más padding vertical */
+            text-align: center;
+            min-height: 75px; /* Un poco más alto */
+            vertical-align: top;
+            font-size: 0.88rem; /* Tamaño de fuente ligero */
+            position: relative;
+            transition: background-color 0.3s;
+        }
+        td:not(:first-child):hover {
+             background-color: #e8f5e9; /* Verde muy pálido al hacer hover */
+             cursor: pointer;
+        }
+        th {
+            background-color: var(--header-bg);
+            color: var(--header-text);
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            font-weight: 500; /* Peso medio */
+            text-transform: uppercase; /* Mayúsculas para cabeceras */
+            letter-spacing: 0.5px;
+             border-bottom: 2px solid var(--quote-border); /* Borde inferior más grueso */
+        }
+        /* Columna de Hora */
+        td:first-child, th:first-child {
+            position: sticky;
+            left: 0;
+            background-color: var(--time-col-bg);
+            color: var(--time-col-text);
+            font-weight: 500;
+            z-index: 15;
+            min-width: 95px;
+            border-right: 2px solid var(--header-bg); /* Borde derecho más marcado */
+        }
+        th:first-child {
+             z-index: 25;
+             border-bottom: 2px solid var(--quote-border);
+        }
+         /* Contenedor de Cita */
+        #quote-container {
+            background-color: var(--quote-bg);
+            border-left: 6px solid var(--quote-border); /* Borde izquierdo más grueso */
+            margin: 25px auto;
+            padding: 20px 25px;
+            max-width: 750px;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+        #quote-text {
+            font-style: italic;
+            color: var(--text-color);
+            font-size: 1.15em;
+            line-height: 1.6;
+        }
+        .icon { margin-right: 6px; font-size: 0.9em; opacity: 0.8;}
+
+        /* Estilo del Modal */
+        .modal {
+            display: none; position: fixed; z-index: 100; left: 0; top: 0;
+            width: 100%; height: 100%; overflow: auto;
+            background-color: rgba(0, 0, 0, 0.55); /* Fondo oscuro semi-transparente */
+            padding-top: 50px; /* Más espacio arriba */
+        }
+        .modal-content {
+            background-color: var(--modal-bg);
+            margin: 5% auto;
+            padding: 30px; /* Más padding */
+            border: 1px solid var(--border-color);
+            width: 90%; /* Más ancho en móviles */
+            max-width: 550px;
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .close-button {
+             color: #999; float: right; font-size: 32px; line-height: 1;
+             font-weight: bold; transition: color 0.3s;
+        }
+        .close-button:hover, .close-button:focus {
+             color: var(--text-color); text-decoration: none; cursor: pointer;
+        }
+        .modal label {
+             display: block; margin-bottom: 6px; font-weight: 500;
+             color: var(--time-col-text); font-size: 0.95em;
+        }
+        .modal textarea, .modal input, .modal select {
+            width: 100%; padding: 12px; margin-bottom: 18px;
+            border: 1px solid var(--border-color); border-radius: 6px;
+            box-sizing: border-box; font-family: 'Raleway', sans-serif;
+            background-color: #fff;
+            transition: border-color 0.3s;
+        }
+        .modal textarea:focus, .modal input:focus, .modal select:focus {
+            outline: none;
+            border-color: var(--button-bg);
+            box-shadow: 0 0 0 2px rgba(129, 199, 132, 0.3); /* Halo verde al enfocar */
+        }
+        .modal button {
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            padding: 12px 25px; border: none; border-radius: 6px;
+            cursor: pointer; font-size: 1.05em; font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        .modal button:hover { background-color: var(--button-hover-bg); }
+        .note-indicator {
+             position: absolute; top: 4px; right: 4px; width: 10px; height: 10px;
+             background-color: var(--note-indicator-color);
+             border-radius: 50%; border: 1px solid #fff;
+             box-shadow: 0 0 4px rgba(0,0,0,0.2);
+        }
+        /* Estilo Botón Notificaciones */
+        #enable-notifications {
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        #enable-notifications:hover {
+            background-color: var(--button-hover-bg);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+         #notification-status {
+             color: var(--time-col-text);
+             margin-top: 5px;
+             font-size: 0.9em;
+         }
+         h1 {
+             color: var(--header-text); /* Título principal con color verde oscuro */
+             font-weight: 700;
+             margin-bottom: 2rem; /* Más espacio debajo del título */
+         }
+
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <h1 class="text-3xl md:text-4xl font-bold text-center">Horario Zen</h1>
+
+    <div id="quote-container">
+        <p id="quote-text">Cargando cita inspiradora...</p>
+    </div>
+
+    <div class="text-center mb-6"> <!-- Margen inferior aumentado -->
+        <button id="enable-notifications">
+            <i class="fa-solid fa-bell icon"></i>Habilitar Notificaciones
+        </button>
+        <p id="notification-status" class="mt-1"></p>
+    </div>
+
+    <div class="table-container">
+        <table class="border">
+            <thead>
+                <tr>
+                    <th class="w-24">Hora</th>
+                    <th>Lunes</th>
+                    <th>Martes</th>
+                    <th>Miércoles</th>
+                    <th>Jueves</th>
+                    <th>Viernes</th>
+                    <th>Sábado</th>
+                </tr>
+            </thead>
+            <tbody id="schedule-body">
+                <!-- El contenido se genera dinámicamente -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal (con atributos ARIA) -->
+    <div id="editModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()" aria-label="Cerrar modal">×</span>
+            <h2 class="text-xl font-semibold mb-5" id="modal-title">Editar Actividad</h2> {/* Más margen inferior */}
+            <input type="hidden" id="modal-time-slot">
+            <input type="hidden" id="modal-day">
+
+            <label for="modal-activity-text">Descripción:</label>
+            <input type="text" id="modal-activity-text" placeholder="Descripción de la actividad">
+
+            <label for="modal-activity-type">Tipo:</label>
+            <select id="modal-activity-type">
+                <!-- Opciones generadas dinámicamente -->
+            </select>
+
+            <label for="modal-activity-notes">Notas:</label>
+            <textarea id="modal-activity-notes" rows="4" placeholder="Añade notas aquí..."></textarea> {/* Más filas */}
+
+            <button onclick="saveActivity()">Guardar Cambios</button>
+        </div>
+    </div>
+
+    <script>
+        // --- DATOS Y CONFIGURACIÓN ---
+        let scheduleData = {
+            // Datos iniciales (sin cambios, pero se sobreescribirán si hay datos guardados)
+             "05:00-07:00": { Monday: null, Tuesday: { text: "Meditación / Estudio Silencioso", type: "routine", notes: "Preparar el día con calma" }, Wednesday: null, Thursday: null, Friday: null, Saturday: null },
+            "07:00-07:30": { Monday: { text: "Rutina Mañana", type: "routine", notes: "" }, Tuesday: { text: "Cálculo Multivariable (FP301)", type: "class", notes: "" }, Wednesday: { text: "Rutina Mañana", type: "routine", notes: "" }, Thursday: { text: "Rutina Mañana", type: "routine", notes: "" }, Friday: { text: "Rutina Mañana", type: "routine", notes: "" }, Saturday: { text: "Camino a U / Rutina", type: "commute", notes: "" } },
+            "07:30-08:30": { Monday: { text: "Desayuno Consciente", type: "meal", notes: "" }, Tuesday: { text: "Cálculo Multivariable (FP301)", type: "class", notes: "" }, Wednesday: { text: "Desayuno Consciente", type: "meal", notes: "" }, Thursday: { text: "Desayuno Consciente", type: "meal", notes: "" }, Friday: { text: "Desayuno Consciente", type: "meal", notes: "" }, Saturday: { text: "Bases de Datos II & Cálculo Multi.", type: "class", notes: "" } },
+            "08:30-09:00": { Monday: { text: "Camino a U", type: "commute", notes: "" }, Tuesday: { text: "Cálculo Multivariable (FP301)", type: "class", notes: "" }, Wednesday: { text: "Ejercicio: Flexibilidad", type: "workout", notes: "" }, Thursday: { text: "Estudio Inglés", type: "study", notes: "" }, Friday: { text: "Ejercicio: Fuerza", type: "workout", notes: "" }, Saturday: { text: "Bases de Datos II & Cálculo Multi.", type: "class", notes: "" } },
+            "09:00-12:00": { Monday: { text: "Desarrollo Plataformas (AULA TIC)", type: "class", notes: "" }, Tuesday: { text: "Estudio Programación Zen", type: "study", notes: "Enfoque profundo" }, Wednesday: { text: "Estructuras Discretas (FJ103-2)", type: "class", notes: "" }, Thursday: { text: "Estudio Programación Zen", type: "study", notes: "" }, Friday: { text: "Estructuras Discretas (FJ103-2)", type: "class", notes: "" }, Saturday: { text: "Bases de Datos II & Cálculo Multi.", type: "class", notes: "" } },
+            "12:00-12:30": { Monday: { text: "Regreso & Podcast", type: "commute", notes: "" }, Tuesday: { text: "Estudio Japonés (Kanji)", type: "study", notes: "Practicar trazos" }, Wednesday: { text: "Regreso & Podcast", type: "commute", notes: "" }, Thursday: { text: "Estudio Japonés (Kanji)", type: "study", notes: "" }, Friday: { text: "Regreso & Podcast", type: "commute", notes: "" }, Saturday: { text: "Regreso & Podcast", type: "commute", notes: "" } },
+            "12:30-13:00": { Monday: { text: "Estudio Japonés", type: "study", notes: "" }, Tuesday: { text: "Estudio Inglés", type: "study", notes: "" }, Wednesday: { text: "Estudio Inglés", type: "study", notes: "" }, Thursday: { text: "Tareas PhD", type: "study", notes: "" }, Friday: { text: "Estudio Programación", type: "study", notes: "" }, Saturday: { text: "Electromagnetismo (EC 111)", type: "class", notes: "" } },
+            "13:00-14:00": { Monday: { text: "Almuerzo", type: "meal", notes: "" }, Tuesday: { text: "Almuerzo", type: "meal", notes: "" }, Wednesday: { text: "Almuerzo", type: "meal", notes: "" }, Thursday: { text: "Almuerzo", type: "meal", notes: "" }, Friday: { text: "Almuerzo", type: "meal", notes: "" }, Saturday: { text: "Almuerzo", type: "meal", notes: "" } },
+            "14:00-15:30": { Monday: { text: "Programación Deep Work", type: "study", notes: "" }, Tuesday: { text: "Programación Deep Work", type: "study", notes: "" }, Wednesday: { text: "Programación Deep Work", type: "study", notes: "" }, Thursday: { text: "Ing. Software (FJ103-2)", type: "class", notes: "" }, Friday: { text: "Desarrollo Plataformas (AULA TIC)", type: "class", notes: "" }, Saturday: { text: "Estudio Inglés", type: "study", notes: "" } },
+            "15:30-16:30": { Monday: { text: "Programación Deep Work", type: "study", notes: "" }, Tuesday: { text: "Repaso Cálculo Multi.", type: "review", notes: "" }, Wednesday: { text: "Repaso Electromagnetismo", type: "review", notes: "" }, Thursday: { text: "Ing. Software (FJ103-2)", type: "class", notes: "" }, Friday: { text: "Desarrollo Plataformas (AULA TIC)", type: "class", notes: "" }, Saturday: { text: "Estudio Japonés", type: "study", notes: "" } },
+            "16:30-17:30": { Monday: { text: "Pausa Activa / Té", type: "break", notes: "Momento de calma" }, Tuesday: { text: "Ing. Software (FJ103-2)", type: "class", notes: "" }, Wednesday: { text: "Abierto (Flexible)", type: "open", notes: "" }, Thursday: { text: "Pausa Activa / Caminar", type: "break", notes: "" }, Friday: { text: "Abierto (Flexible)", type: "open", notes: "" }, Saturday: { text: "Socializar / Relax", type: "social", notes: "" } },
+            "17:30-18:30": { Monday: { text: "Electromagnetismo (106)", type: "class", notes: "" }, Tuesday: { text: "Ing. Software (FJ103-2)", type: "class", notes: "" }, Wednesday: { text: "Japonés Gramática/Escucha", type: "study", notes: "" }, Thursday: { text: "Japonés Gramática/Escucha", type: "study", notes: "" }, Friday: { text: "Estudio Japonés", type: "study", notes: "" }, Saturday: { text: "Lectura Ligera", type: "break", notes: "" } },
+            "18:30-19:30": { Monday: { text: "Electromagnetismo (106)", type: "class", notes: "" }, Tuesday: { text: "Ing. Software (FJ103-2)", type: "class", notes: "" }, Wednesday: { text: "Bases de Datos II (ME 108)", type: "class", notes: "" }, Thursday: { text: "Repaso Electromagnetismo", type: "review", notes: "" }, Friday: { text: "Electromagnetismo (EC 111)", type: "class", notes: "" }, Saturday: { text: "Repaso Electromagnetismo", type: "review", notes: "" } },
+            "19:30-20:30": { Monday: { text: "Electromagnetismo (106)", type: "class", notes: "" }, Tuesday: { text: "Cena", type: "meal", notes: "" }, Wednesday: { text: "Bases de Datos II (MF 108)", type: "class", notes: "" }, Thursday: { text: "Cena", type: "meal", notes: "" }, Friday: { text: "Electromagnetismo (EC 111)", type: "class", notes: "" }, Saturday: { text: "Estudio Programación", type: "study", notes: "" } },
+            "20:30-21:30": { Monday: { text: "Estudio Inglés & Cena", type: "study", notes: "" }, Tuesday: { text: "Repaso Bases Datos", type: "review", notes: "" }, Wednesday: { text: "Cena", type: "meal", notes: "" }, Thursday: { text: "Repaso Des. Plataformas", type: "review", notes: "" }, Friday: { text: "Electromagnetismo (EC 111)", type: "class", notes: "" }, Saturday: { text: "Repaso Estructuras Discretas", type: "review", notes: "" } },
+            "21:30-22:00": { Monday: { text: "Repaso Ing. Software", type: "review", notes: "" }, Tuesday: { text: "Repaso Estructuras Discretas", type: "review", notes: "" }, Wednesday: { text: "Repaso Electro/Cálculo Multi.", type: "review", notes: "" }, Thursday: { text: "Repaso Ing. Software", type: "review", notes: "" }, Friday: { text: "Estudio Inglés", type: "study", notes: "" }, Saturday: { text: "Repaso Ing. Software", type: "review", notes: "" } },
+            "22:00-23:00": { Monday: { text: "Desconectar / Preparar cama", type: "routine", notes: "Sin pantallas" }, Tuesday: { text: "Desconectar / Preparar cama", type: "routine", notes: "" }, Wednesday: { text: "Desconectar / Preparar cama", type: "routine", notes: "" }, Thursday: { text: "Desconectar / Preparar cama", type: "routine", notes: "" }, Friday: { text: "Desconectar / Preparar cama", type: "routine", notes: "" }, Saturday: { text: "Desconectar / Preparar cama", type: "routine", notes: "" } },
+        };
+
+        const quotes = [ // Manteniendo citas fuertes pero con enfoque en disciplina
+            "La disciplina es el puente entre metas y logros. Cruza ese puente cada día.",
+            "El dolor de la disciplina pesa onzas, el dolor del arrepentimiento pesa toneladas.",
+            "No esperes la motivación, cultiva la disciplina. La motivación es fugaz, la disciplina es constante.",
+            "El bambú que se dobla es más fuerte que el roble que resiste. Sé flexible pero firme en tu propósito.", // Toque cultural
+            "Un viaje de mil millas comienza con un solo paso. Da ese paso hoy, y cada día.", // Clásico chino
+            "El éxito no es la ausencia de fracaso; es la persistencia a través del fracaso.",
+            "Domina tu mente o tu mente te dominará a ti.",
+            "El mejor momento para plantar un árbol fue hace 20 años. El segundo mejor momento es ahora." // Proverbio chino
+        ];
+
+        // Estilos de actividad - Mapeo a variables CSS (el nombre sigue igual)
+        // Los iconos y nombres se mantienen, las clases CSS aplicarán los colores de las variables
+        const activityStyles = {
+            class: { name: "Clase", class: 'activity-class', icon: 'fa-solid fa-chalkboard-user' },
+            study: { name: "Estudio", class: 'activity-study', icon: 'fa-solid fa-book-open-reader' },
+            workout: { name: "Ejercicio", class: 'activity-workout', icon: 'fa-solid fa-dumbbell' },
+            meal: { name: "Comida", class: 'activity-meal', icon: 'fa-solid fa-utensils' },
+            routine: { name: "Rutina", class: 'activity-routine', icon: 'fa-solid fa-clock' },
+            commute: { name: "Transporte", class: 'activity-commute', icon: 'fa-solid fa-bus-simple' },
+            break: { name: "Descanso", class: 'activity-break', icon: 'fa-solid fa-mug-saucer' }, // Ícono de taza de té/café
+            social: { name: "Social", class: 'activity-social', icon: 'fa-solid fa-users' },
+            review: { name: "Repaso", class: 'activity-review', icon: 'fa-solid fa-clipboard-check' },
+            open: { name: "Abierto", class: 'activity-open', icon: 'fa-regular fa-hourglass-half' },
+            other: { name: "Otro", class: 'activity-other', icon: 'fa-regular fa-circle-question' }
+        };
+
+        // Variables globales
+        const scheduleBody = document.getElementById('schedule-body');
+        const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const modal = document.getElementById('editModal');
+        const modalTypeSelect = document.getElementById('modal-activity-type');
+        let notificationPermission = Notification.permission;
+        let lastNotifiedSlot = null;
+        const storageKey = 'miHorarioZenData'; // Clave para localStorage
+
+        // --- FUNCIONES ---
+
+        function populateModalTypeSelect() { /* Sin cambios */
+            modalTypeSelect.innerHTML = '';
+            for (const typeKey in activityStyles) {
+                const option = document.createElement('option');
+                option.value = typeKey;
+                option.textContent = activityStyles[typeKey].name;
+                modalTypeSelect.appendChild(option);
+            }
+        }
+
+        function renderSchedule() {
+            scheduleBody.innerHTML = '';
+             const timeSlots = Object.keys(scheduleData).sort((a, b) => {
+                 const hourA = parseInt(a.split(':')[0]);
+                 const hourB = parseInt(b.split(':')[0]);
+                 return hourA - hourB;
+             });
+
+            timeSlots.forEach(timeSlot => {
+                const row = scheduleBody.insertRow();
+                row.setAttribute('data-time-slot', timeSlot);
+
+                const timeCell = row.insertCell();
+                timeCell.textContent = timeSlot;
+                timeCell.classList.add('font-medium', 'text-xs'); // Ajuste visual
+
+                days.forEach((day, dayIndex) => {
+                    const cell = row.insertCell();
+                    const activity = scheduleData[timeSlot]?.[day];
+                    cell.setAttribute('data-day-index', dayIndex);
+                    cell.setAttribute('data-time-slot', timeSlot);
+                    cell.setAttribute('data-day', day);
+                    cell.classList.add('border'); // Asegurar borde básico
+
+                    if (activity) {
+                        const style = activityStyles[activity.type] || activityStyles.other;
+                        cell.classList.add(style.class, 'p-2', 'text-xs'); // Aplicar clase de estilo
+                        cell.innerHTML = `<i class="icon ${style.icon}"></i>${activity.text}`;
+                        if (activity.notes && activity.notes.trim() !== "") {
+                            const noteIndicator = document.createElement('div');
+                            noteIndicator.classList.add('note-indicator');
+                            noteIndicator.title = "Esta actividad tiene notas";
+                            cell.appendChild(noteIndicator);
+                        }
+                        cell.onclick = () => openModal(timeSlot, day);
+                        cell.setAttribute('aria-label', `Actividad: ${activity.text} (${activityStyles[activity.type].name}) el ${day} de ${timeSlot}. Haz clic para editar.`);
+                    } else {
+                        cell.classList.add(activityStyles.open.class, 'p-2'); // Espacio abierto
+                        cell.innerHTML = '<i class="fa-solid fa-plus text-gray-400 opacity-50"></i>'; // Icono más tenue
+                        cell.onclick = () => openModal(timeSlot, day, true);
+                         cell.setAttribute('aria-label', `Bloque libre el ${day} de ${timeSlot}. Haz clic para añadir actividad.`);
+                    }
+                });
+            });
+            updateCurrentTimeIndicator();
+        }
+
+        function openModal(timeSlot, day, isNew = false) { /* Sin cambios funcionales */
+            const activity = scheduleData[timeSlot]?.[day];
+            document.getElementById('modal-time-slot').value = timeSlot;
+            document.getElementById('modal-day').value = day;
+            const modalTitle = document.getElementById('modal-title'); // ARIA necesita que el título esté presente
+
+            if (isNew || !activity) {
+                modalTitle.textContent = `Añadir Actividad (${day} ${timeSlot})`;
+                document.getElementById('modal-activity-text').value = '';
+                document.getElementById('modal-activity-type').value = 'other'; // Por defecto 'Otro'
+                document.getElementById('modal-activity-notes').value = '';
+            } else {
+                modalTitle.textContent = `Editar Actividad (${day} ${timeSlot})`;
+                document.getElementById('modal-activity-text').value = activity.text;
+                document.getElementById('modal-activity-type').value = activity.type;
+                document.getElementById('modal-activity-notes').value = activity.notes || '';
+            }
+            modal.style.display = "block";
+            // Enfocar el primer campo del modal
+            document.getElementById('modal-activity-text').focus();
+        }
+
+        function closeModal() { /* Sin cambios */
+            modal.style.display = "none";
+        }
+
+        // Guardar cambios y persistir en localStorage
+        function saveActivity() {
+            const timeSlot = document.getElementById('modal-time-slot').value;
+            const day = document.getElementById('modal-day').value;
+            const newText = document.getElementById('modal-activity-text').value.trim();
+            const newType = document.getElementById('modal-activity-type').value;
+            const newNotes = document.getElementById('modal-activity-notes').value.trim();
+
+            if (!timeSlot || !day) return; // Validación básica
+
+            // Asegurarse que el slot existe en la estructura principal
+            if (!scheduleData[timeSlot]) {
+                scheduleData[timeSlot] = {};
+            }
+
+            if (newText === "") {
+                // Si se borra el texto, se elimina la actividad para ese día/hora
+                scheduleData[timeSlot][day] = null;
+                 console.log(`Actividad eliminada para ${day} ${timeSlot}`);
+            } else {
+                // Crear o actualizar la actividad
+                 scheduleData[timeSlot][day] = {
+                     text: newText,
+                     type: newType,
+                     notes: newNotes
+                 };
+                 console.log(`Actividad guardada para ${day} ${timeSlot}:`, scheduleData[timeSlot][day]);
+            }
+
+            closeModal(); // Cerrar el modal
+
+            // PERSISTENCIA: Guardar todo el objeto scheduleData en localStorage
+            try {
+                localStorage.setItem(storageKey, JSON.stringify(scheduleData));
+                console.log("Horario guardado en localStorage.");
+            } catch (e) {
+                console.error("Error al guardar en localStorage:", e);
+                alert("Hubo un error al guardar los cambios. Es posible que el almacenamiento esté lleno o deshabilitado.");
+            }
+
+            renderSchedule(); // Volver a renderizar la tabla con los cambios
+        }
+
+        function parseTimeSlot(timeSlot) { /* Sin cambios */
+             const parts = timeSlot.split('-');
+            if (parts.length !== 2) return null;
+            const [startStr, endStr] = parts;
+            const startParts = startStr.split(':');
+            const endParts = endStr.split(':');
+            if (startParts.length !== 2 || endParts.length !== 2) return null;
+            const startHour = parseInt(startParts[0], 10);
+            const startMinute = parseInt(startParts[1], 10);
+            const endHour = parseInt(endParts[0], 10);
+            const endMinute = parseInt(endParts[1], 10);
+             if (isNaN(startHour) || isNaN(startMinute) || isNaN(endHour) || isNaN(endMinute)) return null;
+            return { startHour, startMinute, endHour, endMinute };
+        }
+
+        function updateCurrentTimeIndicator() { /* Lógica sin cambios, estilos actualizados por CSS */
+             const now = new Date();
+            const currentHour = now.getHours();
+            const currentMinute = now.getMinutes();
+             // getDay() da 0 para Domingo, 1 para Lunes... Necesitamos 0 para Lunes... 5 para Sábado
+            const currentDayIndex = (now.getDay() + 6) % 7; // Lunes=0, Martes=1 ... Sábado=5, Domingo=6
+
+            document.querySelectorAll('.current-time-slot').forEach(cell => {
+                cell.classList.remove('current-time-slot');
+                cell.style.transform = '';
+                const indicator = cell.querySelector('.current-time-indicator');
+                if (indicator) indicator.remove();
+            });
+
+             // No mostrar indicador los domingos (índice 6)
+             if (currentDayIndex > 5) return; // Mayor que 5 significa Domingo
+
+            let currentActivity = null;
+            let currentSlotIdentifier = null;
+            const rows = scheduleBody.querySelectorAll('tr');
+
+            rows.forEach(row => {
+                const timeSlot = row.getAttribute('data-time-slot');
+                if (!timeSlot) return;
+                const parsedTime = parseTimeSlot(timeSlot);
+                if (!parsedTime) return;
+
+                const { startHour, startMinute, endHour, endMinute } = parsedTime;
+                const slotStartMinutes = startHour * 60 + startMinute;
+                 // El final del slot es exclusivo (ej. 09:00-12:00 termina a las 11:59:59)
+                 let slotEndMinutes = endHour * 60 + endMinute;
+                 // Si el slot termina a las XX:00, el final real es ese minuto exacto.
+                 // Si es 09:00-12:00 (ends at 12:00), nowMinutes must be < 720.
+                 // Si es 07:00-07:30 (ends at 07:30), nowMinutes must be < 450.
+
+                const nowMinutes = currentHour * 60 + currentMinute;
+
+                 if (nowMinutes >= slotStartMinutes && nowMinutes < slotEndMinutes) {
+                    const currentCell = row.querySelector(`td[data-day-index="${currentDayIndex}"]`);
+                    const timeCell = row.querySelector('td:first-child');
+                    currentSlotIdentifier = `${timeSlot}-${days[currentDayIndex]}`; // Identificador único para notificación
+
+                    if (currentCell) {
+                        currentCell.classList.add('current-time-slot');
+                        const slotDuration = slotEndMinutes - slotStartMinutes;
+                         // Asegurarse de que duration no es 0 para evitar división por cero
+                        const percentageThroughSlot = slotDuration > 0 ? Math.max(0, Math.min(100, ((nowMinutes - slotStartMinutes) / slotDuration) * 100)) : 0;
+
+                        const indicatorLine = document.createElement('div');
+                        indicatorLine.classList.add('current-time-indicator');
+                        indicatorLine.style.top = `${percentageThroughSlot}%`;
+                        currentCell.appendChild(indicatorLine);
+
+                        currentActivity = scheduleData[timeSlot]?.[days[currentDayIndex]];
+                    }
+                    if (timeCell) {
+                        timeCell.classList.add('current-time-slot'); // Resaltar también la celda de hora
+                    }
+                }
+            });
+
+            // Enviar notificación si la actividad actual es nueva y tenemos permiso
+            if (currentActivity && notificationPermission === 'granted' && currentSlotIdentifier !== lastNotifiedSlot) {
+                sendNotification(`Ahora: ${currentActivity.text}`, currentActivity.notes || "Es hora de comenzar.");
+                lastNotifiedSlot = currentSlotIdentifier; // Marcar como notificado
+            } else if (!currentActivity) {
+                 lastNotifiedSlot = null; // Resetear si no hay actividad actual (espacio libre)
+            }
+        }
+
+        function displayRandomQuote() { /* Sin cambios */
+             const quoteText = document.getElementById('quote-text');
+            if (quoteText && quotes.length > 0) {
+                const randomIndex = Math.floor(Math.random() * quotes.length);
+                quoteText.textContent = `"${quotes[randomIndex]}"`;
+            } else if (quoteText) {
+                quoteText.textContent = "La disciplina es la clave del éxito."; // Mensaje por defecto
+            }
+        }
+
+        function requestNotificationPermission() { /* Sin cambios funcionales */
+            const statusElem = document.getElementById('notification-status');
+            if (!("Notification" in window)) {
+                statusElem.textContent = "Este navegador no soporta notificaciones.";
+                return;
+            }
+            Notification.requestPermission().then(permission => {
+                notificationPermission = permission; // Actualizar estado global
+                if (permission === "granted") {
+                    statusElem.textContent = "¡Notificaciones habilitadas!";
+                    sendNotification("Permiso concedido", "Recibirás recordatorios de tus actividades.");
+                } else if (permission === "denied") {
+                    statusElem.textContent = "Notificaciones bloqueadas. Revisa la configuración del navegador.";
+                } else {
+                    statusElem.textContent = "Permiso de notificación no concedido.";
+                }
+                 updateNotificationButtonStatus(); // Actualizar estado visual
+            });
+        }
+
+         function sendNotification(title, body = "") { /* Sin cambios */
+             if (notificationPermission !== 'granted') return;
+             const options = {
+                 body: body || "Es hora de empezar esta actividad.",
+                 icon: './icon.png' // Opcional: Añadir un icono (asegúrate que exista)
+             };
+             try {
+                 new Notification(title, options);
+             } catch (error) {
+                 console.error("Error al enviar notificación:", error);
+             }
+         }
+
+         function updateNotificationButtonStatus() { /* Lógica sin cambios */
+             const statusElem = document.getElementById('notification-status');
+             const button = document.getElementById('enable-notifications');
+             if (!("Notification" in window)) {
+                 button.disabled = true;
+                 statusElem.textContent = "Notificaciones no soportadas.";
+                 return;
+             }
+
+             if (notificationPermission === 'granted') {
+                 statusElem.textContent = "Notificaciones habilitadas.";
+                 button.style.opacity = '0.7'; // Indicar que ya está activo
+             } else if (notificationPermission === 'denied') {
+                 statusElem.textContent = "Notificaciones bloqueadas por el navegador.";
+                 button.disabled = true; // Deshabilitar si está bloqueado
+                 button.style.opacity = '0.5';
+             } else {
+                 statusElem.textContent = "Haz clic para habilitar recordatorios.";
+                 button.disabled = false;
+                 button.style.opacity = '1';
+             }
+         }
+
+        // --- INICIALIZACIÓN ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // PERSISTENCIA: Cargar datos de localStorage al iniciar
+            const savedData = localStorage.getItem(storageKey);
+            if (savedData) {
+                try {
+                    const parsedData = JSON.parse(savedData);
+                    // Validar si es un objeto antes de asignarlo
+                    if (parsedData && typeof parsedData === 'object') {
+                         scheduleData = parsedData;
+                         console.log("Horario cargado desde localStorage.");
+                    } else {
+                         console.warn("Datos guardados en localStorage no son válidos, usando datos por defecto.");
+                    }
+                } catch (e) {
+                    console.error("Error al parsear datos de localStorage:", e);
+                    // Opcional: borrar datos corruptos localStorage.removeItem(storageKey);
+                    alert("Hubo un error al cargar los datos guardados. Se usará el horario por defecto.");
+                }
+            } else {
+                 console.log("No se encontraron datos guardados, usando horario por defecto.");
+            }
+
+
+            populateModalTypeSelect(); // Llenar el <select> del modal
+            renderSchedule();          // Dibujar la tabla inicial
+            updateCurrentTimeIndicator(); // Marcar la hora actual
+            displayRandomQuote();      // Mostrar una cita
+            updateNotificationButtonStatus(); // Poner estado del botón de notificaciones
+
+            document.getElementById('enable-notifications').addEventListener('click', requestNotificationPermission);
+
+            // Actualizar indicador de hora cada 30 segundos
+            setInterval(updateCurrentTimeIndicator, 30000);
+
+            // Cerrar modal al hacer clic fuera de él
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    closeModal();
+                }
+            }
+
+            // Cerrar modal con la tecla Escape
+             window.addEventListener('keydown', function(event) {
+                 if (event.key === 'Escape' && modal.style.display === "block") {
+                     closeModal();
+                 }
+             });
+        });
+
+    </script>
+
+</body>
+</html>

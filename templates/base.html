@@ -11,7 +11,8 @@
 <body>
 <div class="container">
     <div class="nav">
-        <a href="{% url 'task-list' %}">Inicio</a>
+        <a href="{% url 'task-list' %}">Tareas</a>
+        <a href="{% url 'schedule' %}">Horario</a>
         {% if user.is_authenticated %}
         <form action="{% url 'logout' %}" method="post" class="logout-form">
             {% csrf_token %}
