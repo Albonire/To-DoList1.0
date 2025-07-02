@@ -17,16 +17,8 @@
                 <div class="form-field">
                     {% if field.name == 'fecha_vencimiento' %}
                         <input type="date" name="{{ field.name }}" id="{{ field.id_for_label }}" 
-                               class="form-control" placeholder="dd/mm/yyyy"
+                               class="form-control"
                                {% if field.value %}value="{{ field.value|date:'Y-m-d' }}"{% endif %}>
-                    {% elif field.name == 'fecha_hora_inicio' %}
-                        <input type="datetime-local" name="{{ field.name }}" id="{{ field.id_for_label }}" 
-                               class="form-control"
-                               {% if field.value %}value="{{ field.value|date:'Y-m-d\\TH:i' }}"{% endif %}>
-                    {% elif field.name == 'fecha_hora_vencimiento' %}
-                        <input type="datetime-local" name="{{ field.name }}" id="{{ field.id_for_label }}" 
-                               class="form-control"
-                               {% if field.value %}value="{{ field.value|date:'Y-m-d\\TH:i' }}"{% endif %}>
                     {% elif field.name == 'agregar_al_horario' %}
                         <div class="checkbox-wrapper">
                             <input type="checkbox" name="{{ field.name }}" id="{{ field.id_for_label }}" 

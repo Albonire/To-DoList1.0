@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">
+        <i class="fas fa-calendar-check mr-3 text-green-600"></i>
+        Tareas Integradas con Horario
+    </h1>
+
+    <!-- Tareas en horario -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-semibold mb-4 text-green-700 border-b-2 border-green-200 pb-2">
+            <i class="fas fa-clock mr-2"></i>
+            Tareas Programadas en Horario
+        </h2>
+        
+        {% if tasks_with_schedule %}
+            <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {% for task in tasks_with_schedule %}
+                    <div class="bg-white rounded-lg shadow-md border-l-4 border-green-500 p-6 hover:shadow-lg transition-shadow">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-lg font-semibold text-gray-800">{{ task.nombre }}</h3>
+                            <span class="px-2 py-1 text-xs font-medium rounded-full 
+                                {% if task.prioridad == 'alta' %}bg-red-100 text-red-800
+                                {% elif task.prioridad == 'media' %}bg-yellow-100 text-yellow-800
+                                {% else %}bg-green-100 text-green-800{% endif %}">
+                                {{ task.get_prioridad_display }}
+                            </span>
+                        </div>
+                        
+                        <p class="text-gray-600 text-sm mb-3">{{ task.descripcion|truncatewords:20 }}</p>
+                        
+                        <div class="space-y-2 text-sm text-gray-700">
+                            <div class="flex items-center">
+                                <i class="fas fa-calendar-day mr-2 text-green-600"></i>
+                                <span>{{ task.get_dia_semana_display }}</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-clock mr-2 text-blue-600"></i>
+                                <span>{{ task.hora_inicio|time:"H:i" }} ({{ task.duracion_minutos }} min)</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-calendar-alt mr-2 text-purple-600"></i>
+                                <span>Vence: {{ task.fecha_vencimiento|date:"d/m/Y" }}</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-info-circle mr-2 text-gray-600"></i>
+                                <span class="px-2 py-1 text-xs font-medium rounded-full
+                                    {% if task.estado == 'completada' %}bg-green-100 text-green-800
+                                    {% elif task.estado == 'en_progreso' %}bg-blue-100 text-blue-800
+                                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                    {{ task.get_estado_display }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 flex gap-2">
+                            <a href="{% url 'task-detail' task.pk %}" 
+                               class="flex-1 bg-blue-500 text-white text-center py-2 px-3 rounded-md hover:bg-blue-600 transition-colors text-sm">
+                                <i class="fas fa-eye mr-1"></i>Ver
+                            </a>
+                            <a href="{% url 'task-update' task.pk %}" 
+                               class="flex-1 bg-green-500 text-white text-center py-2 px-3 rounded-md hover:bg-green-600 transition-colors text-sm">
+                                <i class="fas fa-edit mr-1"></i>Editar
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-8">
+                <i class="fas fa-calendar-times text-4xl text-gray-400 mb-4"></i>
+                <p class="text-gray-600">No hay tareas programadas en el horario.</p>
+                <a href="{% url 'task-create' %}" class="inline-block mt-4 bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600 transition-colors">
+                    <i class="fas fa-plus mr-2"></i>Crear Tarea
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Tareas sin horario -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-700 border-b-2 border-gray-200 pb-2">
+            <i class="fas fa-list mr-2"></i>
+            Tareas Sin Programar
+        </h2>
+        
+        {% if tasks_without_schedule %}
+            <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {% for task in tasks_without_schedule %}
+                    <div class="bg-white rounded-lg shadow-md border-l-4 border-gray-400 p-6 hover:shadow-lg transition-shadow">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-lg font-semibold text-gray-800">{{ task.nombre }}</h3>
+                            <span class="px-2 py-1 text-xs font-medium rounded-full 
+                                {% if task.prioridad == 'alta' %}bg-red-100 text-red-800
+                                {% elif task.prioridad == 'media' %}bg-yellow-100 text-yellow-800
+                                {% else %}bg-green-100 text-green-800{% endif %}">
+                                {{ task.get_prioridad_display }}
+                            </span>
+                        </div>
+                        
+                        <p class="text-gray-600 text-sm mb-3">{{ task.descripcion|truncatewords:20 }}</p>
+                        
+                        <div class="space-y-2 text-sm text-gray-700">
+                            <div class="flex items-center">
+                                <i class="fas fa-calendar-alt mr-2 text-purple-600"></i>
+                                <span>Vence: {{ task.fecha_vencimiento|date:"d/m/Y" }}</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-info-circle mr-2 text-gray-600"></i>
+                                <span class="px-2 py-1 text-xs font-medium rounded-full
+                                    {% if task.estado == 'completada' %}bg-green-100 text-green-800
+                                    {% elif task.estado == 'en_progreso' %}bg-blue-100 text-blue-800
+                                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                    {{ task.get_estado_display }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 flex gap-2">
+                            <a href="{% url 'task-detail' task.pk %}" 
+                               class="flex-1 bg-blue-500 text-white text-center py-2 px-3 rounded-md hover:bg-blue-600 transition-colors text-sm">
+                                <i class="fas fa-eye mr-1"></i>Ver
+                            </a>
+                            <a href="{% url 'task-update' task.pk %}" 
+                               class="flex-1 bg-green-500 text-white text-center py-2 px-3 rounded-md hover:bg-green-600 transition-colors text-sm">
+                                <i class="fas fa-edit mr-1"></i>Editar
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-8">
+                <i class="fas fa-check-circle text-4xl text-green-400 mb-4"></i>
+                <p class="text-gray-600">¡Excelente! Todas las tareas están programadas en el horario.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Enlaces de navegación -->
+    <div class="text-center space-x-4">
+        <a href="{% url 'task-list' %}" class="inline-block bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition-colors">
+            <i class="fas fa-list mr-2"></i>Ver Todas las Tareas
+        </a>
+        <a href="{% url 'schedule' %}" class="inline-block bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600 transition-colors">
+            <i class="fas fa-calendar mr-2"></i>Ver Horario
+        </a>
+        <a href="{% url 'task-create' %}" class="inline-block bg-purple-500 text-white px-6 py-2 rounded-md hover:bg-purple-600 transition-colors">
+            <i class="fas fa-plus mr-2"></i>Nueva Tarea
+        </a>
+    </div>
+</div>
+{% endblock %} 

@@ -9,6 +9,12 @@ from .models import Task, Schedule
 from .forms import TaskForm, ScheduleForm
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+import datetime
+
+def json_serial(obj):
+    if isinstance(obj, (datetime.datetime, datetime.date, datetime.time)):
+        return obj.isoformat()
+    raise TypeError(f"Type {type(obj)} not serializable")
 
 def register(request):
     if request.method == 'POST':
@@ -48,12 +54,10 @@ class TaskListView(LoginRequiredMixin, ListView):
         
         tasks_list = list(Task.objects.filter(usuario=self.request.user).values())
         for task in tasks_list:
-            if task['fecha_hora_inicio']:
-                task['fecha_hora_inicio'] = str(task['fecha_hora_inicio'])
-            else:
-                task['fecha_hora_inicio'] = None
-            task['fecha_vencimiento'] = str(task['fecha_vencimiento'])
-        context['tasks_json'] = json.dumps(tasks_list)
+            for k, v in task.items():
+                if isinstance(v, (datetime.date, datetime.time, datetime.datetime)):
+                    task[k] = v.isoformat()
+        context['tasks_json'] = json.dumps(tasks_list, default=json_serial)
         return context
 
 class TaskDetailView(LoginRequiredMixin, DetailView):
@@ -108,13 +112,25 @@ class ScheduleView(LoginRequiredMixin, ListView):
             if schedule.time_slot not in schedule_data:
                 schedule_data[schedule.time_slot] = {}
             
+            # Serializar fecha_vencimiento y otros posibles campos de tipo date/time
+            task_info = None
+            if schedule.tarea_relacionada:
+                task_info = {
+                    'id': schedule.tarea_relacionada.id,
+                    'nombre': schedule.tarea_relacionada.nombre,
+                    'estado': schedule.tarea_relacionada.estado,
+                    'prioridad': schedule.tarea_relacionada.prioridad,
+                    'fecha_vencimiento': schedule.tarea_relacionada.fecha_vencimiento.isoformat() if schedule.tarea_relacionada.fecha_vencimiento else None,
+                }
             schedule_data[schedule.time_slot][schedule.day] = {
                 'text': schedule.activity_text,
                 'type': schedule.activity_type,
-                'notes': schedule.notes
+                'notes': schedule.notes,
+                'has_task': schedule.tarea_relacionada is not None,
+                'task_info': task_info
             }
         
-        context['schedule_data_json'] = json.dumps(schedule_data)
+        context['schedule_data_json'] = json.dumps(schedule_data, default=json_serial)
         context['activity_types'] = Schedule.ACTIVITY_TYPES
         context['days_of_week'] = Schedule.DAYS_OF_WEEK
         
@@ -194,3 +210,25 @@ def save_schedule_activity(request):
             return JsonResponse({'error': str(e)}, status=500)
     
     return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+# Vista para mostrar tareas relacionadas con horarios
+@login_required
+def tasks_with_schedule(request):
+    """Vista para mostrar tareas que están integradas con el horario"""
+    tasks_with_schedule = Task.objects.filter(
+        usuario=request.user,
+        agregar_al_horario=True
+    ).order_by('dia_semana', 'hora_inicio')
+    
+    tasks_without_schedule = Task.objects.filter(
+        usuario=request.user,
+        agregar_al_horario=False
+    ).order_by('fecha_vencimiento')
+    
+    context = {
+        'tasks_with_schedule': tasks_with_schedule,
+        'tasks_without_schedule': tasks_without_schedule,
+        'days_of_week': Schedule.DAYS_OF_WEEK,
+    }
+    
+    return render(request, 'tareas/tasks_with_schedule.html', context)

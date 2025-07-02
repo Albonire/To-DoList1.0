@@ -3,15 +3,16 @@ from . import views
 
 urlpatterns = [
     path('', views.TaskListView.as_view(), name='task-list'),
-    path('tarea/<int:pk>/', views.TaskDetailView.as_view(), name='task-detail'),
-    path('tarea/nueva/', views.TaskCreateView.as_view(), name='task-create'),
-    path('tarea/<int:pk>/editar/', views.TaskUpdateView.as_view(), name='task-update'),
-    path('tarea/<int:pk>/eliminar/', views.TaskDeleteView.as_view(), name='task-delete'),
+    path('task/<int:pk>/', views.TaskDetailView.as_view(), name='task-detail'),
+    path('task/new/', views.TaskCreateView.as_view(), name='task-create'),
+    path('task/<int:pk>/edit/', views.TaskUpdateView.as_view(), name='task-update'),
+    path('task/<int:pk>/delete/', views.TaskDeleteView.as_view(), name='task-delete'),
     
     # URLs para el horario
-    path('horario/', views.ScheduleView.as_view(), name='schedule'),
-    path('horario/nuevo/', views.ScheduleCreateView.as_view(), name='schedule-create'),
-    path('horario/<int:pk>/editar/', views.ScheduleUpdateView.as_view(), name='schedule-update'),
-    path('horario/<int:pk>/eliminar/', views.ScheduleDeleteView.as_view(), name='schedule-delete'),
-    path('horario/api/save/', views.save_schedule_activity, name='schedule-save-api'),
+    path('schedule/', views.ScheduleView.as_view(), name='schedule'),
+    path('schedule/new/', views.ScheduleCreateView.as_view(), name='schedule-create'),
+    path('schedule/<int:pk>/edit/', views.ScheduleUpdateView.as_view(), name='schedule-update'),
+    path('schedule/<int:pk>/delete/', views.ScheduleDeleteView.as_view(), name='schedule-delete'),
+    path('schedule/save-api/', views.save_schedule_activity, name='schedule-save-api'),
+    path('tasks-with-schedule/', views.tasks_with_schedule, name='tasks-with-schedule'),
 ]

@@ -67,6 +67,21 @@
                 <textarea id="modal-activity-notes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Añade notas aquí..."></textarea>
             </div>
 
+            <!-- Información de tarea relacionada -->
+            <div id="task-info" class="hidden bg-blue-50 border border-blue-200 rounded-md p-3">
+                <h4 class="text-sm font-medium text-blue-800 mb-2">
+                    <i class="fa-solid fa-link mr-1"></i>Tarea relacionada
+                </h4>
+                <div id="task-details" class="text-sm text-blue-700">
+                    <!-- Los detalles se cargan dinámicamente -->
+                </div>
+                <div class="mt-2">
+                    <a id="view-task-link" href="#" class="text-blue-600 hover:text-blue-800 text-sm underline">
+                        <i class="fa-solid fa-external-link-alt mr-1"></i>Ver tarea
+                    </a>
+                </div>
+            </div>
+
             <div class="flex gap-3 pt-4">
                 <button onclick="saveActivity()" class="flex-1 bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition-colors">
                     <i class="fa-solid fa-save mr-2"></i>Guardar
@@ -186,6 +201,33 @@ td:not(:first-child):hover {
     box-shadow: 0 0 4px rgba(0,0,0,0.2);
 }
 
+/* Indicador de tarea relacionada */
+.task-indicator {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 8px;
+    height: 8px;
+    background-color: #3b82f6;
+    border-radius: 50%;
+    border: 1px solid #fff;
+    box-shadow: 0 0 4px rgba(59, 130, 246, 0.4);
+}
+
+.activity-with-task {
+    border-left: 3px solid #3b82f6 !important;
+    position: relative;
+}
+
+.activity-with-task::before {
+    content: "📋";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    font-size: 10px;
+    opacity: 0.7;
+}
+
 .modal {
     display: none;
 }
@@ -196,8 +238,16 @@ td:not(:first-child):hover {
 </style>
 
 <script>
-// Datos del horario desde Django
+// Debug: Mostrar datos del horario en consola
 let scheduleData = {{ schedule_data_json|safe }};
+console.log('Schedule Data:', scheduleData);
+
+// Horarios predeterminados (7:00 AM a 9:00 PM)
+const defaultTimeSlots = [
+    "07:00-08:00", "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-12:00",
+    "12:00-13:00", "13:00-14:00", "14:00-15:00", "15:00-16:00", "16:00-17:00",
+    "17:00-18:00", "18:00-19:00", "19:00-20:00", "20:00-21:00"
+];
 
 const quotes = [
     "La disciplina es el puente entre metas y logros. Cruza ese puente cada día.",
@@ -233,13 +283,17 @@ let lastNotifiedSlot = null;
 // Funciones del horario
 function renderSchedule() {
     scheduleBody.innerHTML = '';
-    const timeSlots = Object.keys(scheduleData).sort((a, b) => {
+    
+    // Usar horarios predeterminados si no hay datos, o combinar con datos existentes
+    const existingTimeSlots = Object.keys(scheduleData);
+    const allTimeSlots = [...new Set([...defaultTimeSlots, ...existingTimeSlots])].sort((a, b) => {
         const hourA = parseInt(a.split(':')[0]);
         const hourB = parseInt(b.split(':')[0]);
         return hourA - hourB;
     });
 
-    timeSlots.forEach(timeSlot => {
+    allTimeSlots.forEach(timeSlot => {
+=======
         const row = scheduleBody.insertRow();
         row.setAttribute('data-time-slot', timeSlot);
 
@@ -259,12 +313,24 @@ function renderSchedule() {
                 const style = activityStyles[activity.type] || activityStyles.other;
                 cell.classList.add(style.class);
                 cell.innerHTML = `<i class="icon ${style.icon} mr-2"></i>${activity.text}`;
+                
+                // Agregar indicador de notas si existe
                 if (activity.notes && activity.notes.trim() !== "") {
                     const noteIndicator = document.createElement('div');
                     noteIndicator.classList.add('note-indicator');
                     noteIndicator.title = "Esta actividad tiene notas";
                     cell.appendChild(noteIndicator);
                 }
+                
+                // Agregar indicador de tarea relacionada si existe
+                if (activity.has_task && activity.task_info) {
+                    cell.classList.add('activity-with-task');
+                    const taskIndicator = document.createElement('div');
+                    taskIndicator.classList.add('task-indicator');
+                    taskIndicator.title = `Tarea relacionada: ${activity.task_info.nombre} (${activity.task_info.estado})`;
+                    cell.appendChild(taskIndicator);
+                }
+                
                 cell.onclick = () => openModal(timeSlot, day);
             } else {
                 cell.classList.add(activityStyles.open.class);
@@ -281,17 +347,35 @@ function openModal(timeSlot, day, isNew = false) {
     document.getElementById('modal-time-slot').value = timeSlot;
     document.getElementById('modal-day').value = day;
     const modalTitle = document.getElementById('modal-title');
+    const taskInfo = document.getElementById('task-info');
+    const taskDetails = document.getElementById('task-details');
+    const viewTaskLink = document.getElementById('view-task-link');
 
     if (isNew || !activity) {
         modalTitle.textContent = `Añadir Actividad (${day} ${timeSlot})`;
         document.getElementById('modal-activity-text').value = '';
         document.getElementById('modal-activity-type').value = 'other';
         document.getElementById('modal-activity-notes').value = '';
+        taskInfo.classList.add('hidden');
     } else {
         modalTitle.textContent = `Editar Actividad (${day} ${timeSlot})`;
         document.getElementById('modal-activity-text').value = activity.text;
         document.getElementById('modal-activity-type').value = activity.type;
         document.getElementById('modal-activity-notes').value = activity.notes || '';
+        
+        // Mostrar información de tarea relacionada si existe
+        if (activity.has_task && activity.task_info) {
+            taskInfo.classList.remove('hidden');
+            taskDetails.innerHTML = `
+                <div class="mb-1"><strong>Nombre:</strong> ${activity.task_info.nombre}</div>
+                <div class="mb-1"><strong>Estado:</strong> ${activity.task_info.estado}</div>
+                <div class="mb-1"><strong>Prioridad:</strong> ${activity.task_info.prioridad}</div>
+                <div><strong>Vencimiento:</strong> ${activity.task_info.fecha_vencimiento}</div>
+            `;
+            viewTaskLink.href = `/tareas/task/${activity.task_info.id}/`;
+        } else {
+            taskInfo.classList.add('hidden');
+        }
     }
     modal.classList.add('show');
     document.getElementById('modal-activity-text').focus();
@@ -336,10 +420,14 @@ async function saveActivity() {
             if (newText === "") {
                 scheduleData[timeSlot][day] = null;
             } else {
+                // Mantener información de tarea relacionada si existe
+                const existingTaskInfo = scheduleData[timeSlot]?.[day]?.task_info;
                 scheduleData[timeSlot][day] = {
                     text: newText,
                     type: newType,
-                    notes: newNotes
+                    notes: newNotes,
+                    has_task: existingTaskInfo ? true : false,
+                    task_info: existingTaskInfo || null
                 };
             }
             closeModal();

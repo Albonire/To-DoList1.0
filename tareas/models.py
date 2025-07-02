@@ -34,6 +34,9 @@ class Schedule(models.Model):
     activity_type = models.CharField(max_length=20, choices=ACTIVITY_TYPES, verbose_name=_('Tipo'))
     notes = models.TextField(blank=True, verbose_name=_('Notas'))
     
+    # Campo para relación con tarea
+    tarea_relacionada = models.ForeignKey('Task', on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_('Tarea relacionada'))
+    
     class Meta:
         unique_together = ['usuario', 'time_slot', 'day']
         verbose_name = _('Horario')
@@ -41,6 +44,101 @@ class Schedule(models.Model):
     
     def __str__(self):
         return f"{self.usuario.username} - {self.day} {self.time_slot}: {self.activity_text}"
+    
+    def save(self, *args, **kwargs):
+        # Bandera para evitar bucles infinitos
+        if hasattr(self, '_syncing_from_task'):
+            super().save(*args, **kwargs)
+            return
+            
+        # Guardar primero el horario
+        super().save(*args, **kwargs)
+        
+        # Si no tiene tarea relacionada y no es una actividad del sistema, crear una tarea
+        if not self.tarea_relacionada and not self._is_system_activity():
+            self._crear_tarea_desde_horario()
+        elif self.tarea_relacionada:
+            # Si tiene tarea relacionada, actualizar la tarea
+            self._actualizar_tarea_desde_horario()
+    
+    def _is_system_activity(self):
+        """Determina si es una actividad del sistema (no debe crear tarea)"""
+        system_activities = ['break', 'commute', 'meal']
+        return self.activity_type in system_activities
+    
+    def _crear_tarea_desde_horario(self):
+        """Crea una nueva tarea basada en la actividad del horario"""
+        # Extraer hora de inicio del time_slot
+        hora_inicio_str = self.time_slot.split('-')[0]
+        try:
+            hora_inicio = datetime.strptime(hora_inicio_str, '%H:%M').time()
+        except ValueError:
+            return
+        
+        # Mapear tipo de actividad a prioridad
+        tipo_to_prioridad = {
+            'study': 'alta',
+            'class': 'media',
+            'workout': 'media',
+            'routine': 'baja',
+            'social': 'baja',
+            'review': 'media',
+            'other': 'media'
+        }
+        prioridad = tipo_to_prioridad.get(self.activity_type, 'media')
+        
+        # Calcular fecha de vencimiento (próximo día de la semana)
+        from datetime import date, timedelta
+        dias_semana = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+        dia_index = dias_semana.index(self.day)
+        hoy = date.today()
+        dias_hasta_dia = (dia_index - hoy.weekday()) % 7
+        if dias_hasta_dia == 0:  # Si es hoy, usar la próxima semana
+            dias_hasta_dia = 7
+        fecha_vencimiento = hoy + timedelta(days=dias_hasta_dia)
+        
+        # Crear la tarea
+        tarea = Task.objects.create(
+            nombre=self.activity_text,
+            descripcion=self.notes or f"Actividad del horario: {self.activity_text}",
+            fecha_vencimiento=fecha_vencimiento,
+            estado='pendiente',
+            prioridad=prioridad,
+            usuario=self.usuario,
+            agregar_al_horario=False,  # Evitar bucle
+            dia_semana=self.day,
+            hora_inicio=hora_inicio,
+            duracion_minutos=60  # Por defecto
+        )
+        
+        # Asignar la tarea creada a este horario
+        self.tarea_relacionada = tarea
+        self._syncing_from_task = True  # Evitar bucle
+        if self.pk:
+            super().save(update_fields=['tarea_relacionada'])
+        else:
+            super().save()
+    
+    def _actualizar_tarea_desde_horario(self):
+        """Actualiza la tarea relacionada con los datos del horario"""
+        if not self.tarea_relacionada:
+            return
+            
+        # Extraer hora de inicio
+        hora_inicio_str = self.time_slot.split('-')[0]
+        try:
+            hora_inicio = datetime.strptime(hora_inicio_str, '%H:%M').time()
+        except ValueError:
+            return
+        
+        # Actualizar la tarea sin disparar la sincronización inversa
+        self.tarea_relacionada._syncing_from_schedule = True
+        self.tarea_relacionada.nombre = self.activity_text
+        self.tarea_relacionada.descripcion = self.notes or f"Actividad del horario: {self.activity_text}"
+        self.tarea_relacionada.dia_semana = self.day
+        self.tarea_relacionada.hora_inicio = hora_inicio
+        self.tarea_relacionada.save()
+        delattr(self.tarea_relacionada, '_syncing_from_schedule')
 
 class Task(models.Model):
     ESTADO_CHOICES = [
@@ -58,8 +156,6 @@ class Task(models.Model):
     nombre = models.CharField(max_length=200, verbose_name=_('Nombre'))
     descripcion = models.TextField(verbose_name=_('Descripción'))
     fecha_vencimiento = models.DateField(verbose_name=_('Fecha de vencimiento'))
-    fecha_hora_inicio = models.DateTimeField(null=True, blank=True, verbose_name=_('Fecha y hora de inicio'))
-    fecha_hora_vencimiento = models.DateTimeField(null=True, blank=True, verbose_name=_('Fecha y hora de vencimiento'))
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='pendiente', verbose_name=_('Estado'))
     prioridad = models.CharField(max_length=10, choices=PRIORIDAD_CHOICES, default='media', verbose_name=_('Prioridad'))
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_('Usuario'))
@@ -75,25 +171,33 @@ class Task(models.Model):
 
     def clean(self):
         super().clean()
-        if self.fecha_hora_inicio and self.fecha_hora_vencimiento:
-            if self.fecha_hora_inicio > self.fecha_hora_vencimiento:
+        # Validación: si se agrega al horario, debe tener día y hora
+        if self.agregar_al_horario:
+            if not self.dia_semana:
                 from django.core.exceptions import ValidationError
-                raise ValidationError(_('La fecha y hora de inicio no puede ser posterior a la de vencimiento.'))
-
+                raise ValidationError(_('Debe seleccionar un día de la semana para agregar al horario.'))
+            if not self.hora_inicio:
+                from django.core.exceptions import ValidationError
+                raise ValidationError(_('Debe especificar una hora de inicio para agregar al horario.'))
+    
     def save(self, *args, **kwargs):
-        # Guardar la tarea primero
+        print(f"[DEBUG][Task.save] Guardando tarea: {self.nombre}, agregar_al_horario={self.agregar_al_horario}, dia_semana={self.dia_semana}, hora_inicio={self.hora_inicio}")
+        if hasattr(self, '_syncing_from_schedule'):
+            print("[DEBUG][Task.save] _syncing_from_schedule detectado, guardado directo.")
+            super().save(*args, **kwargs)
+            return
         super().save(*args, **kwargs)
-        
-        # Si se marca para agregar al horario, crear/actualizar la actividad
         if self.agregar_al_horario and self.dia_semana and self.hora_inicio:
+            print("[DEBUG][Task.save] Llamando a _actualizar_actividad_horario")
             self._actualizar_actividad_horario()
         elif not self.agregar_al_horario:
-            # Si se desmarca, eliminar la actividad del horario
+            print("[DEBUG][Task.save] Llamando a _eliminar_actividad_horario")
             self._eliminar_actividad_horario()
     
     def _actualizar_actividad_horario(self):
-        """Actualiza o crea la actividad en el horario basada en la tarea"""
+        print(f"[DEBUG][_actualizar_actividad_horario] Ejecutando para tarea: {self.nombre}, usuario={self.usuario}, dia_semana={self.dia_semana}, hora_inicio={self.hora_inicio}, duracion_minutos={self.duracion_minutos}")
         if not self.dia_semana or not self.hora_inicio:
+            print("[DEBUG][_actualizar_actividad_horario] Faltan campos requeridos, no se crea Schedule.")
             return
             
         # Calcular hora de fin
@@ -128,7 +232,9 @@ class Task(models.Model):
             schedule.activity_text = self.nombre
             schedule.activity_type = activity_type
             schedule.notes = f"Tarea: {self.descripcion[:100]}{'...' if len(self.descripcion) > 100 else ''}"
-            schedule.save()
+        # Enlazar la tarea relacionada y guardar
+        schedule.tarea_relacionada = self
+        schedule.save()
     
     def _eliminar_actividad_horario(self):
         """Elimina la actividad del horario asociada a esta tarea"""
