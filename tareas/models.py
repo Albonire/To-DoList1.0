@@ -74,7 +74,6 @@ class Schedule(models.Model):
             hora_inicio = datetime.strptime(hora_inicio_str, '%H:%M').time()
         except ValueError:
             return
-        
         # Mapear tipo de actividad a prioridad
         tipo_to_prioridad = {
             'study': 'alta',
@@ -86,17 +85,15 @@ class Schedule(models.Model):
             'other': 'media'
         }
         prioridad = tipo_to_prioridad.get(self.activity_type, 'media')
-        
         # Calcular fecha de vencimiento (próximo día de la semana)
         from datetime import date, timedelta
         dias_semana = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
         dia_index = dias_semana.index(self.day)
         hoy = date.today()
         dias_hasta_dia = (dia_index - hoy.weekday()) % 7
-        if dias_hasta_dia == 0:  # Si es hoy, usar la próxima semana
+        if dias_hasta_dia == 0:
             dias_hasta_dia = 7
         fecha_vencimiento = hoy + timedelta(days=dias_hasta_dia)
-        
         # Crear la tarea
         tarea = Task.objects.create(
             nombre=self.activity_text,
@@ -105,18 +102,20 @@ class Schedule(models.Model):
             estado='pendiente',
             prioridad=prioridad,
             usuario=self.usuario,
-            agregar_al_horario=False,  # Evitar bucle
+            agregar_al_horario=False,
             dia_semana=self.day,
             hora_inicio=hora_inicio,
-            duracion_minutos=60  # Por defecto
+            duracion_minutos=60
         )
-        
         # Asignar la tarea creada a este horario
         self.tarea_relacionada = tarea
-        self._syncing_from_task = True  # Evitar bucle
+        self._syncing_from_task = True
+        print(f"[DEBUG][_crear_tarea_desde_horario] self.pk={self.pk}, tarea_relacionada={self.tarea_relacionada}")
         if self.pk:
+            print("[DEBUG][_crear_tarea_desde_horario] Usando save(update_fields=['tarea_relacionada'])")
             super().save(update_fields=['tarea_relacionada'])
         else:
+            print("[DEBUG][_crear_tarea_desde_horario] Usando save() normal")
             super().save()
     
     def _actualizar_tarea_desde_horario(self):
