@@ -111,12 +111,7 @@ class Schedule(models.Model):
         self.tarea_relacionada = tarea
         self._syncing_from_task = True
         print(f"[DEBUG][_crear_tarea_desde_horario] self.pk={self.pk}, tarea_relacionada={self.tarea_relacionada}")
-        if self.pk:
-            print("[DEBUG][_crear_tarea_desde_horario] Usando save(update_fields=['tarea_relacionada'])")
-            super().save(update_fields=['tarea_relacionada'])
-        else:
-            print("[DEBUG][_crear_tarea_desde_horario] Usando save() normal")
-            super().save()
+        super().save()
     
     def _actualizar_tarea_desde_horario(self):
         """Actualiza la tarea relacionada con los datos del horario"""
