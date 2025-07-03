@@ -14,5 +14,4 @@ urlpatterns = [
     path('schedule/<int:pk>/edit/', views.ScheduleUpdateView.as_view(), name='schedule-update'),
     path('schedule/<int:pk>/delete/', views.ScheduleDeleteView.as_view(), name='schedule-delete'),
     path('schedule/save-api/', views.save_schedule_activity, name='schedule-save-api'),
-    path('tasks-with-schedule/', views.tasks_with_schedule, name='tasks-with-schedule'),
 ]

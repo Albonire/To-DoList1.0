@@ -210,25 +210,3 @@ def save_schedule_activity(request):
             return JsonResponse({'error': str(e)}, status=500)
     
     return JsonResponse({'error': 'Método no permitido'}, status=405)
-
-# Vista para mostrar tareas relacionadas con horarios
-@login_required
-def tasks_with_schedule(request):
-    """Vista para mostrar tareas que están integradas con el horario"""
-    tasks_with_schedule = Task.objects.filter(
-        usuario=request.user,
-        agregar_al_horario=True
-    ).order_by('dia_semana', 'hora_inicio')
-    
-    tasks_without_schedule = Task.objects.filter(
-        usuario=request.user,
-        agregar_al_horario=False
-    ).order_by('fecha_vencimiento')
-    
-    context = {
-        'tasks_with_schedule': tasks_with_schedule,
-        'tasks_without_schedule': tasks_without_schedule,
-        'days_of_week': Schedule.DAYS_OF_WEEK,
-    }
-    
-    return render(request, 'tareas/tasks_with_schedule.html', context)
