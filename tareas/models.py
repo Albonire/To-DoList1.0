@@ -37,6 +37,9 @@ class Task(models.Model):
     hora_inicio = models.TimeField(blank=True, null=True, verbose_name=_('Hora de inicio'))
     duracion_minutos = models.IntegerField(default=60, verbose_name=_('Duración (minutos)'))
     
+    # Campo para notificaciones
+    recordatorio_enviado = models.BooleanField(default=False, verbose_name=_('Recordatorio enviado'))
+    
     def __str__(self):
         return self.nombre
     
