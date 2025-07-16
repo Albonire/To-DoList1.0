@@ -1,70 +1,77 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block title %}Horario Semanal - {{ block.super }}{% endblock %}
+
 {% block content %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'css/schedule.css' %}">
+<div class="page-header">
+    <h1>Horario Semanal</h1>
+    <button id="enable-notifications" class="btn btn-secondary">
+        <i class="fas fa-bell"></i> Habilitar Notificaciones
+    </button>
+</div>
+<p id="notification-status" class="text-secondary text-center" style="margin-top: -1.5rem; margin-bottom: 1.5rem;"></p>
 
-<div class="p-4 md:p-8">
+<div id="quote-container">
+    <p id="quote-text" class="text-secondary">Cargando cita inspiradora...</p>
+</div>
 
-    <h1 class="text-3xl md:text-4xl font-bold text-center">Horario Zen</h1>
+<div class="schedule-container">
+    <table class="schedule-table">
+        <thead>
+            <tr>
+                <th>Hora</th>
+                <th>Lunes</th>
+                <th>Martes</th>
+                <th>Miércoles</th>
+                <th>Jueves</th>
+                <th>Viernes</th>
+                <th>Sábado</th>
+            </tr>
+        </thead>
+        <tbody id="schedule-body">
+            <!-- El contenido se genera dinámicamente con JS -->
+        </tbody>
+    </table>
+</div>
 
-    <div id="quote-container">
-        <p id="quote-text">Cargando cita inspiradora...</p>
-    </div>
-
-    <div class="text-center mb-6"> <!-- Margen inferior aumentado -->
-        <button id="enable-notifications">
-            <i class="fa-solid fa-bell icon"></i>Habilitar Notificaciones
-        </button>
-        <p id="notification-status" class="mt-1"></p>
-    </div>
-
-    <div class="table-container">
-        <table class="border">
-            <thead>
-                <tr>
-                    <th class="w-24">Hora</th>
-                    <th>Lunes</th>
-                    <th>Martes</th>
-                    <th>Miércoles</th>
-                    <th>Jueves</th>
-                    <th>Viernes</th>
-                    <th>Sábado</th>
-                </tr>
-            </thead>
-            <tbody id="schedule-body">
-                <!-- El contenido se genera dinámicamente -->
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Modal (con atributos ARIA) -->
-    <div id="editModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeModal()" aria-label="Cerrar modal">×</span>
-            <h2 class="text-xl font-semibold mb-5" id="modal-title">Editar Actividad</h2>
+<!-- Modal de Edición -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modal-title">Editar Actividad</h2>
+            <button class="close-button" onclick="closeModal()" aria-label="Cerrar modal">&times;</button>
+        </div>
+        <div class="modal-body">
             <input type="hidden" id="modal-time-slot">
             <input type="hidden" id="modal-day">
 
-            <label for="modal-activity-text">Descripción:</label>
-            <input type="text" id="modal-activity-text" placeholder="Descripción de la actividad">
+            <div class="form-group">
+                <label for="modal-activity-text" class="form-label">Descripción:</label>
+                <input type="text" id="modal-activity-text" class="form-control" placeholder="¿Qué tienes planeado?">
+            </div>
 
-            <label for="modal-activity-type">Tipo:</label>
-            <select id="modal-activity-type">
-                <!-- Opciones generadas dinámicamente -->
-            </select>
+            <div class="form-group">
+                <label for="modal-activity-type" class="form-label">Tipo de Actividad:</label>
+                <select id="modal-activity-type" class="form-control">
+                    <!-- Opciones generadas dinámicamente -->
+                </select>
+            </div>
 
-            <label for="modal-activity-notes">Notas:</label>
-            <textarea id="modal-activity-notes" rows="4" placeholder="Añade notas aquí..."></textarea>
-
-            <button onclick="saveActivity()">Guardar Cambios</button>
+            <div class="form-group">
+                <label for="modal-activity-notes" class="form-label">Notas Adicionales:</label>
+                <textarea id="modal-activity-notes" class="form-control" rows="4" placeholder="Añade detalles, enlaces o recordatorios..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button onclick="saveActivity()" class="btn btn-primary">Guardar Cambios</button>
+            <button onclick="closeModal()" class="btn btn-secondary">Cancelar</button>
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
+{{ block.super }}
 <script src="{% static 'js/schedule.js' %}"></script>
 {% endblock %}

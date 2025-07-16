@@ -1,10 +1,38 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}Iniciar Sesión - {{ block.super }}{% endblock %}
+
 {% block content %}
-  <h2>Iniciar sesión</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Entrar</button>
-  </form>
-  <p>¿No tienes cuenta? <a href="{% url 'register' %}">Regístrate</a></p>
+<div class="auth-container">
+    <div class="auth-card">
+        <h1>Iniciar Sesión</h1>
+        <form method="post">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label for="id_username" class="form-label">Usuario</label>
+                <input type="text" name="username" id="id_username" class="form-control" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="id_password" class="form-label">Contraseña</label>
+                <input type="password" name="password" id="id_password" class="form-control" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Entrar</button>
+        </form>
+        <p class="auth-switch-link">
+            ¿No tienes una cuenta? <a href="{% url 'register' %}">Regístrate</a>
+        </p>
+    </div>
+</div>
 {% endblock %}

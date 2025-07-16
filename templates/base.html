@@ -4,34 +4,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestor de Tareas Personales Avanzado</title>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS via CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>{% block title %}Gestor de Tareas{% endblock %}</title>
+    
+    <!-- Fuentes y Estilos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+
 </head>
-<body class="bg-gray-100 font-sans">
-<div class="container mx-auto p-4">
-    <nav class="bg-white shadow-md rounded-lg p-4 mb-6 flex justify-between items-center">
-        <div>
-            <a href="{% url 'task-list' %}" class="text-lg font-semibold text-gray-700 hover:text-blue-600 mr-4">Tareas</a>
-            <a href="{% url 'schedule' %}" class="text-lg font-semibold text-gray-700 hover:text-blue-600">Horario</a>
-        </div>
-        <div>
-            {% if user.is_authenticated %}
+<body>
+
+<nav class="main-nav">
+    <div class="nav-links">
+        <a href="{% url 'task-list' %}">Tareas</a>
+        <a href="{% url 'schedule' %}">Horario</a>
+    </div>
+    <div class="nav-actions">
+        {% if user.is_authenticated %}
             <form action="{% url 'logout' %}" method="post" class="inline">
                 {% csrf_token %}
-                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
-                    Cerrar sesión
-                </button>
+                <button type="submit" class="btn btn-secondary">Cerrar sesión</button>
             </form>
-            {% else %}
-                <a href="/accounts/login/" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2">Iniciar sesión</a>
-                <a href="/accounts/register/" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">Registrarse</a>
-            {% endif %}
-        </div>
-    </nav>
+        {% else %}
+            <a href="/accounts/login/" class="btn btn-secondary">Iniciar sesión</a>
+            <a href="/accounts/register/" class="btn btn-primary">Registrarse</a>
+        {% endif %}
+        <button id="theme-switcher" aria-label="Cambiar tema">
+            <i class="fas fa-moon icon-moon"></i>
+            <i class="fas fa-sun icon-sun"></i>
+        </button>
+    </div>
+</nav>
+
+<main class="container">
     {% block content %}{% endblock %}
-</div>
+</main>
+
+<script>
+    // Lógica para el cambio de tema
+    const themeSwitcher = document.getElementById('theme-switcher');
+    const body = document.body;
+
+    // Cargar el tema guardado en localStorage o usar el preferido por el sistema
+    const currentTheme = localStorage.getItem('theme');
+    if (currentTheme) {
+        body.classList.add(currentTheme);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        body.classList.add('dark-theme');
+    }
+
+    themeSwitcher.addEventListener('click', () => {
+        body.classList.toggle('dark-theme');
+        
+        // Guardar la preferencia del usuario
+        let theme = 'light-theme';
+        if (body.classList.contains('dark-theme')) {
+            theme = 'dark-theme';
+        }
+        localStorage.setItem('theme', theme);
+    });
+</script>
+{% block scripts %}{% endblock %}
+
 </body>
 </html>
