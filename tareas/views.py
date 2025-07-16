@@ -95,6 +95,27 @@ class TaskDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     def get_queryset(self):
         return Task.objects.filter(usuario=self.request.user)
 
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+
+@login_required
+@require_POST
+def toggle_task_complete(request, pk):
+    try:
+        task = Task.objects.get(pk=pk, usuario=request.user)
+        if task.estado == 'completada':
+            task.estado = 'en_progreso'
+            message = "Tarea marcada como 'En progreso'."
+        else:
+            task.estado = 'completada'
+            message = "¡Tarea completada!"
+        task.save()
+        return JsonResponse({'success': True, 'message': message, 'estado': task.estado})
+    except Task.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Tarea no encontrada o no tienes permiso para editarla.'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
 @login_required
 def schedule_view(request):
     """

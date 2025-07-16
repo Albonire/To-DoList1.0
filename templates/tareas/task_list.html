@@ -47,6 +47,10 @@
                 {% if task.fecha_vencimiento < today and task.estado != 'completada' %}task-overdue{% endif %}">
                 
                 <div class="task-card-header">
+                    <form action="{% url 'task-toggle-complete' task.pk %}" method="post" class="task-complete-form" data-task-id="{{ task.pk }}">
+                        {% csrf_token %}
+                        <input type="checkbox" class="task-complete-checkbox" {% if task.estado == 'completada' %}checked{% endif %}>
+                    </form>
                     <h2 class="task-title">
                         <a href="{% url 'task-detail' task.pk %}">{{ task.nombre }}</a>
                     </h2>
@@ -84,7 +88,5 @@
 
 {% block scripts %}
 {{ block.super }}
-<script>
-    // Aquí puedes añadir JS específico para la lista de tareas si es necesario en el futuro.
-</script>
+<script src="{% static 'js/quick_complete.js' %}"></script>
 {% endblock %}
