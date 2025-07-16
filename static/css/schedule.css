@@ -1,0 +1,228 @@
+/* --- PALETA DE COLORES Y DISEÑO --- */
+:root {
+    --bg-color: #f4f8f4; /* Verde muy pálido / Blanco roto */
+    --table-bg: #ffffff;
+    --header-bg: #a5d8a5; /* Verde pálido medio */
+    --header-text: #2e4d2e; /* Verde oscuro para texto */
+    --time-col-bg: #c8e6c9; /* Verde más pálido para columna de hora */
+    --time-col-text: #385c38;
+    --border-color: #dcedc8; /* Verde muy claro para bordes */
+    --text-color: #333333;
+    --quote-border: #81c784; /* Verde medio para acento cita */
+    --quote-bg: #e8f5e9; /* Verde muy pálido para fondo cita */
+    --modal-bg: #f8faf8;
+    --button-bg: #81c784;
+    --button-hover-bg: #6aa36a;
+    --button-text: #ffffff;
+    --current-time-bg: #fff9c4; /* Amarillo pálido/dorado suave */
+    --current-time-border: #fbc02d; /* Dorado más fuerte */
+    --current-indicator: #e53935; /* Rojo suave para línea indicadora */
+    --note-indicator-color: #ffa726; /* Naranja suave para indicador nota */
+
+    /* Colores de Actividad (Tonos verdes, beige, gris) */
+    --activity-class-bg: #c8e6c9; --activity-class-border: #a5d8a5;
+    --activity-study-bg: #e0f2f1; --activity-study-border: #b2dfdb; /* Verde azulado pálido */
+    --activity-workout-bg: #dcedc8; --activity-workout-border: #c5e1a5;
+    --activity-meal-bg: #fff8e1; --activity-meal-border: #ffecb3; /* Beige pálido */
+    --activity-routine-bg: #f1f8e9; --activity-routine-border: #dcedc8;
+    --activity-commute-bg: #eceff1; --activity-commute-border: #cfd8dc; /* Gris azulado pálido */
+    --activity-break-bg: #fffde7; --activity-break-border: #fff9c4; /* Amarillo muy pálido */
+    --activity-social-bg: #fbe9e7; --activity-social-border: #ffccbc; /* Melocotón pálido */
+    --activity-review-bg: #e8f5e9; --activity-review-border: #c8e6c9;
+    --activity-open-bg: #fafafa; --activity-open-border: #f5f5f5; /* Gris muy pálido */
+    --activity-other-bg: #f5f5f5; --activity-other-border: #e0e0e0;
+}
+
+body {
+    font-family: 'Raleway', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    /* Sutil fondo con patrón japonés Seigaiha */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%23dcedc8' fill-opacity='0.2'%3E%3Cpath fill-rule='evenodd' d='M11 0l5 20H6l5-20zm42 31l5 20H48l5-20zm-30 25l5 20H28l5-20zM73 0l5 20H68l5-20z'%3E%3C/path%3E%3C/g%3E%3C/svg%3E");
+}
+
+.current-time-slot {
+    background-color: var(--current-time-bg) !important;
+    border: 2px solid var(--current-time-border) !important;
+    position: relative;
+    font-weight: bold;
+    transform: scale(1.01);
+    transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+    z-index: 10; /* Asegurar que esté sobre la línea */
+}
+
+.current-time-indicator {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background-color: var(--current-indicator);
+    z-index: 11; /* Sobre el fondo resaltado */
+    box-shadow: 0 1px 3px rgba(229, 57, 53, 0.4);
+}
+
+/* Clases de Actividad con variables CSS */
+.activity-class { background-color: var(--activity-class-bg); border-color: var(--activity-class-border); }
+.activity-study { background-color: var(--activity-study-bg); border-color: var(--activity-study-border); }
+.activity-workout { background-color: var(--activity-workout-bg); border-color: var(--activity-workout-border); }
+.activity-meal { background-color: var(--activity-meal-bg); border-color: var(--activity-meal-border); }
+.activity-routine { background-color: var(--activity-routine-bg); border-color: var(--activity-routine-border); }
+.activity-commute { background-color: var(--activity-commute-bg); border-color: var(--activity-commute-border); }
+.activity-break { background-color: var(--activity-break-bg); border-color: var(--activity-break-border); }
+.activity-social { background-color: var(--activity-social-bg); border-color: var(--activity-social-border); }
+.activity-review { background-color: var(--activity-review-bg); border-color: var(--activity-review-border); }
+.activity-open { background-color: var(--activity-open-bg); border-color: var(--activity-open-border); }
+.activity-other { background-color: var(--activity-other-bg); border-color: var(--activity-other-border); }
+
+.table-container {
+     width: 100%;
+     overflow-x: auto;
+     border-radius: 8px; /* Bordes redondeados */
+     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Sombra más suave */
+}
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 900px;
+    background-color: var(--table-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden; /* Para que el radius funcione con sticky */
+}
+th, td {
+    border: 1px solid var(--border-color);
+    padding: 12px 10px; /* Más padding vertical */
+    text-align: center;
+    min-height: 75px; /* Un poco más alto */
+    vertical-align: top;
+    font-size: 0.88rem; /* Tamaño de fuente ligero */
+    position: relative;
+    transition: background-color 0.3s;
+}
+td:not(:first-child):hover {
+     background-color: #e8f5e9; /* Verde muy pálido al hacer hover */
+     cursor: pointer;
+}
+th {
+    background-color: var(--header-bg);
+    color: var(--header-text);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    font-weight: 500; /* Peso medio */
+    text-transform: uppercase; /* Mayúsculas para cabeceras */
+    letter-spacing: 0.5px;
+     border-bottom: 2px solid var(--quote-border); /* Borde inferior más grueso */
+}
+/* Columna de Hora */
+td:first-child, th:first-child {
+    position: sticky;
+    left: 0;
+    background-color: var(--time-col-bg);
+    color: var(--time-col-text);
+    font-weight: 500;
+    z-index: 15;
+    min-width: 95px;
+    border-right: 2px solid var(--header-bg); /* Borde derecho más marcado */
+}
+th:first-child {
+     z-index: 25;
+     border-bottom: 2px solid var(--quote-border);
+}
+ /* Contenedor de Cita */
+#quote-container {
+    background-color: var(--quote-bg);
+    border-left: 6px solid var(--quote-border); /* Borde izquierdo más grueso */
+    margin: 25px auto;
+    padding: 20px 25px;
+    max-width: 750px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+#quote-text {
+    font-style: italic;
+    color: var(--text-color);
+    font-size: 1.15em;
+    line-height: 1.6;
+}
+.icon { margin-right: 6px; font-size: 0.9em; opacity: 0.8;}
+
+/* Estilo del Modal */
+.modal {
+    display: none; position: fixed; z-index: 100; left: 0; top: 0;
+    width: 100%; height: 100%; overflow: auto;
+    background-color: rgba(0, 0, 0, 0.55); /* Fondo oscuro semi-transparente */
+    padding-top: 50px; /* Más espacio arriba */
+}
+.modal-content {
+    background-color: var(--modal-bg);
+    margin: 5% auto;
+    padding: 30px; /* Más padding */
+    border: 1px solid var(--border-color);
+    width: 90%; /* Más ancho en móviles */
+    max-width: 550px;
+    border-radius: 10px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+.close-button {
+     color: #999; float: right; font-size: 32px; line-height: 1;
+     font-weight: bold; transition: color 0.3s;
+}
+.close-button:hover, .close-button:focus {
+     color: var(--text-color); text-decoration: none; cursor: pointer;
+}
+.modal label {
+     display: block; margin-bottom: 6px; font-weight: 500;
+     color: var(--time-col-text); font-size: 0.95em;
+}
+.modal textarea, .modal input, .modal select {
+    width: 100%; padding: 12px; margin-bottom: 18px;
+    border: 1px solid var(--border-color); border-radius: 6px;
+    box-sizing: border-box; font-family: 'Raleway', sans-serif;
+    background-color: #fff;
+    transition: border-color 0.3s;
+}
+.modal textarea:focus, .modal input:focus, .modal select:focus {
+    outline: none;
+    border-color: var(--button-bg);
+    box-shadow: 0 0 0 2px rgba(129, 199, 132, 0.3); /* Halo verde al enfocar */
+}
+.modal button {
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    padding: 12px 25px; border: none; border-radius: 6px;
+    cursor: pointer; font-size: 1.05em; font-weight: 500;
+    transition: background-color 0.3s;
+}
+.modal button:hover { background-color: var(--button-hover-bg); }
+.note-indicator {
+     position: absolute; top: 4px; right: 4px; width: 10px; height: 10px;
+     background-color: var(--note-indicator-color);
+     border-radius: 50%; border: 1px solid #fff;
+     box-shadow: 0 0 4px rgba(0,0,0,0.2);
+}
+/* Estilo Botón Notificaciones */
+#enable-notifications {
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+#enable-notifications:hover {
+    background-color: var(--button-hover-bg);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+ #notification-status {
+     color: var(--time-col-text);
+     margin-top: 5px;
+     font-size: 0.9em;
+ }
+ h1 {
+     color: var(--header-text); /* Título principal con color verde oscuro */
+     font-weight: 700;
+     margin-bottom: 2rem; /* Más espacio debajo del título */
+ }
