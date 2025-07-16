@@ -1,5 +1,5 @@
 from django import forms
-from .models import Task, Schedule
+from .models import Task
 from django.core.exceptions import ValidationError
 from datetime import date, timedelta
 from django.utils.translation import gettext_lazy as _
@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ['nombre', 'descripcion', 'fecha_vencimiento', 'estado', 'prioridad', 'agregar_al_horario', 'dia_semana', 'hora_inicio', 'duracion_minutos']
+        fields = ['nombre', 'descripcion', 'fecha_vencimiento', 'estado', 'prioridad', 'dia_semana', 'hora_inicio', 'duracion_minutos']
         widgets = {
             'fecha_vencimiento': forms.DateInput(
                 attrs={
@@ -47,58 +47,15 @@ class TaskForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        agregar_al_horario = cleaned_data.get('agregar_al_horario')
         dia_semana = cleaned_data.get('dia_semana')
         hora_inicio = cleaned_data.get('hora_inicio')
-        if agregar_al_horario:
-            if not dia_semana:
-                raise ValidationError(_('Debe seleccionar un día de la semana para agregar al horario.'))
-            if not hora_inicio:
-                raise ValidationError(_('Debe especificar una hora de inicio para agregar al horario.'))
-        return cleaned_data
-
-class ScheduleForm(forms.ModelForm):
-    class Meta:
-        model = Schedule
-        fields = ['time_slot', 'day', 'activity_text', 'activity_type', 'notes']
-        widgets = {
-            'time_slot': forms.TextInput(
-                attrs={
-                    'placeholder': 'ej: 09:00-12:00',
-                    'pattern': r'\d{1,2}:\d{2}-\d{1,2}:\d{2}',
-                    'title': 'Formato: HH:MM-HH:MM'
-                }
-            ),
-            'activity_text': forms.TextInput(
-                attrs={
-                    'placeholder': 'Descripción de la actividad'
-                }
-            ),
-            'notes': forms.Textarea(
-                attrs={
-                    'rows': 3,
-                    'placeholder': 'Notas adicionales...'
-                }
-            ),
-        }
-
-    def clean_time_slot(self):
-        time_slot = self.cleaned_data.get('time_slot')
-        if time_slot:
-            # Validar formato HH:MM-HH:MM
-            import re
-            if not re.match(r'^\d{1,2}:\d{2}-\d{1,2}:\d{2}$', time_slot):
-                raise ValidationError(_('El formato debe ser HH:MM-HH:MM (ej: 09:00-12:00)'))
-            
-            # Validar que la hora de inicio sea menor que la de fin
-            start, end = time_slot.split('-')
-            start_hour, start_min = map(int, start.split(':'))
-            end_hour, end_min = map(int, end.split(':'))
-            
-            start_minutes = start_hour * 60 + start_min
-            end_minutes = end_hour * 60 + end_min
-            
-            if start_minutes >= end_minutes:
-                raise ValidationError(_('La hora de inicio debe ser anterior a la hora de fin'))
         
-        return time_slot
+        # Si se especifica un día, la hora también es requerida.
+        if dia_semana and not hora_inicio:
+            self.add_error('hora_inicio', _('Debe especificar una hora de inicio si selecciona un día.'))
+        
+        # Si se especifica una hora, el día también es requerido.
+        if hora_inicio and not dia_semana:
+            self.add_error('dia_semana', _('Debe seleccionar un día si especifica una hora.'))
+            
+        return cleaned_data
