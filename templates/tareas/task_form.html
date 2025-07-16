@@ -14,7 +14,7 @@
             <div class="form-group" id="group_{{ field.id_for_label }}">
                 {% if field.name == 'agregar_al_horario' %}
                     <div class="checkbox-group">
-                        {{ field|add_class:"form-checkbox" }}
+                        {% render_field field class="form-checkbox" %}
                         <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                     </div>
                 {% else %}
