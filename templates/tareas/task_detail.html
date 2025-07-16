@@ -1,12 +1,45 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ task.nombre }} - {{ block.super }}{% endblock %}
+
 {% block content %}
-<h2>{{ task.nombre }}</h2>
-<p><strong>Descripción:</strong> {{ task.descripcion }}</p>
-<p><strong>Estado:</strong> {{ task.get_estado_display }}</p>
-<p><strong>Prioridad:</strong> {{ task.get_prioridad_display }}</p>
-<p><strong>Fecha de vencimiento:</strong> {{ task.fecha_vencimiento }}</p>
-{% if task.fecha_hora_vencimiento %}<p><strong>Fecha y hora de vencimiento:</strong> {{ task.fecha_hora_vencimiento|date:'d M Y H:i' }}</p>{% endif %}
-<a href="{% url 'task-update' task.pk %}">Editar</a> |
-<a href="{% url 'task-delete' task.pk %}">Eliminar</a> |
-<a href="{% url 'task-list' %}">Volver al listado</a>
+<div class="detail-container">
+    <div class="detail-header">
+        <a href="{% url 'task-list' %}" class="back-link"><i class="fas fa-arrow-left"></i> Volver al listado</a>
+        <div class="detail-actions">
+            <a href="{% url 'task-update' task.pk %}" class="btn btn-secondary"><i class="fas fa-edit"></i> Editar</a>
+            <a href="{% url 'task-delete' task.pk %}" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Eliminar</a>
+        </div>
+    </div>
+
+    <div class="detail-card">
+        <div class="detail-card-body">
+            <h1>{{ task.nombre }}</h1>
+            
+            <div class="detail-meta">
+                <span class="task-status status-{{ task.estado|lower }}">
+                    <i class="fas fa-circle"></i> {{ task.get_estado_display }}
+                </span>
+                <span class="task-priority priority-{{ task.prioridad|lower }}">
+                    {{ task.get_prioridad_display }}
+                </span>
+                <span class="meta-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    Vence: {{ task.fecha_vencimiento|date:"d M Y" }}
+                </span>
+            </div>
+
+            {% if task.descripcion %}
+                <div class="detail-description">
+                    <p>{{ task.descripcion|linebreaks }}</p>
+                </div>
+            {% else %}
+                <div class="detail-description">
+                    <p class="text-secondary"><em>No hay una descripción para esta tarea.</em></p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
 {% endblock %}

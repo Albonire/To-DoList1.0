@@ -1,18 +1,27 @@
 {% extends "base.html" %}
 {% load static %}
+{% load widget_tweaks %}
 
 {% block title %}{% if form.instance.pk %}Editar Tarea{% else %}Nueva Tarea{% endif %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="form-container">
-    <form method="post" class="styled-form">
+    <form method="post" class="styled-form" novalidate>
         <h1>{% if form.instance.pk %}✏️ Editar Tarea{% else %}✨ Nueva Tarea{% endif %}</h1>
         {% csrf_token %}
 
         {% for field in form %}
-            <div class="form-group">
-                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                {{ field }}
+            <div class="form-group" id="group_{{ field.id_for_label }}">
+                {% if field.name == 'agregar_al_horario' %}
+                    <div class="checkbox-group">
+                        {{ field|add_class:"form-checkbox" }}
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    </div>
+                {% else %}
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    {% render_field field class="form-control" %}
+                {% endif %}
+                
                 {% if field.help_text %}
                     <small class="text-secondary">{{ field.help_text|safe }}</small>
                 {% endif %}
@@ -34,5 +43,25 @@
 
 {% block scripts %}
 {{ block.super }}
-<script src="{% static 'js/task_form.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const checkbox = document.getElementById('id_agregar_al_horario');
+    if (checkbox) {
+        const scheduleFieldIds = ['group_id_dia_semana', 'group_id_hora_inicio', 'group_id_duracion_minutos'];
+
+        function toggleScheduleFields() {
+            const isChecked = checkbox.checked;
+            scheduleFieldIds.forEach(id => {
+                const formGroup = document.getElementById(id);
+                if (formGroup) {
+                    formGroup.style.display = isChecked ? 'block' : 'none';
+                }
+            });
+        }
+
+        toggleScheduleFields();
+        checkbox.addEventListener('change', toggleScheduleFields);
+    }
+});
+</script>
 {% endblock %}
