@@ -1,10 +1,25 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}Confirmar Eliminación - {{ block.super }}{% endblock %}
+
 {% block content %}
-  <h2>Eliminar tarea</h2>
-  <p>¿Seguro que deseas eliminar la tarea "{{ task.nombre }}"?</p>
-  <form method="post">
-    {% csrf_token %}
-    <button type="submit">Sí, eliminar</button>
-    <a href="{% url 'task-list' %}">Cancelar</a>
-  </form>
+<div class="auth-container">
+    <div class="auth-card">
+        <h1 class="text-center">🗑️ Eliminar Tarea</h1>
+        <p class="text-center text-secondary">¿Estás seguro de que deseas eliminar la tarea de forma permanente?</p>
+        
+        <div class="delete-confirm-item">
+            "{{ task.nombre }}"
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-actions-delete">
+                <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+                <a href="{% url 'task-detail' task.pk %}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}

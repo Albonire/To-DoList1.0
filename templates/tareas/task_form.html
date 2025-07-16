@@ -1,315 +1,38 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Editar Tarea{% else %}Nueva Tarea{% endif %} - {{ block.super }}{% endblock %}
 
 {% block content %}
 <div class="form-container">
-    <h2>{% if form.instance.pk %}✏️ Editar tarea{% else %} Nueva tarea{% endif %}</h2>
-    
-    <form method="post" class="task-form">
+    <form method="post" class="styled-form">
+        <h1>{% if form.instance.pk %}✏️ Editar Tarea{% else %}✨ Nueva Tarea{% endif %}</h1>
         {% csrf_token %}
-        
+
         {% for field in form %}
-            <div class="form-group {% if field.errors %}has-error{% endif %}">
-                <label for="{{ field.id_for_label }}" class="form-label">
-                    {{ field.label }}
-                    {% if field.field.required %}<span class="required">*</span>{% endif %}
-                </label>
-                
-                <div class="form-field">
-                    {% if field.name == 'fecha_vencimiento' %}
-                        <input type="date" name="{{ field.name }}" id="{{ field.id_for_label }}" 
-                               class="form-control"
-                               {% if field.value %}value="{{ field.value|date:'Y-m-d' }}"{% endif %}>
-                    {% elif field.name == 'agregar_al_horario' %}
-                        <div class="checkbox-wrapper">
-                            <input type="checkbox" name="{{ field.name }}" id="{{ field.id_for_label }}" 
-                                   class="form-checkbox" {% if field.value %}checked{% endif %}>
-                            <label for="{{ field.id_for_label }}" class="checkbox-label">
-                                <i class="fas fa-calendar-plus mr-2"></i>{{ field.label }}
-                            </label>
-                        </div>
-                    {% elif field.name == 'dia_semana' %}
-                        <select name="{{ field.name }}" id="{{ field.id_for_label }}" class="form-control schedule-field">
-                            <option value="">Seleccionar día</option>
-                            {% for value, label in field.field.choices %}
-                                {% if value %}
-                                    <option value="{{ value }}" {% if field.value == value %}selected{% endif %}>{{ label }}</option>
-                                {% endif %}
-                            {% endfor %}
-                        </select>
-                    {% elif field.name == 'hora_inicio' %}
-                        <input type="time" name="{{ field.name }}" id="{{ field.id_for_label }}" 
-                               class="form-control schedule-field"
-                               {% if field.value %}value="{{ field.value|time:'H:i' }}"{% endif %}>
-                    {% elif field.name == 'duracion_minutos' %}
-                        <select name="{{ field.name }}" id="{{ field.id_for_label }}" class="form-control schedule-field">
-                            <option value="15" {% if field.value == 15 %}selected{% endif %}>15 minutos</option>
-                            <option value="30" {% if field.value == 30 %}selected{% endif %}>30 minutos</option>
-                            <option value="45" {% if field.value == 45 %}selected{% endif %}>45 minutos</option>
-                            <option value="60" {% if field.value == 60 or not field.value %}selected{% endif %}>1 hora</option>
-                            <option value="90" {% if field.value == 90 %}selected{% endif %}>1.5 horas</option>
-                            <option value="120" {% if field.value == 120 %}selected{% endif %}>2 horas</option>
-                            <option value="180" {% if field.value == 180 %}selected{% endif %}>3 horas</option>
-                            <option value="240" {% if field.value == 240 %}selected{% endif %}>4 horas</option>
-                        </select>
-                    {% else %}
-                        {{ field }}
-                    {% endif %}
-                    
-                    {% if field.help_text %}
-                        <small class="form-text text-muted">{{ field.help_text }}</small>
-                    {% endif %}
-                    
-                    {% for error in field.errors %}
-                        <div class="invalid-feedback">
-                            {{ error }}
-                        </div>
-                    {% endfor %}
-                </div>
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                    <small class="text-secondary">{{ field.help_text|safe }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                    <p class="error-text">{{ error }}</p>
+                {% endfor %}
             </div>
         {% endfor %}
-        
+
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save"></i> Guardar
+                <i class="fas fa-save"></i> Guardar Cambios
             </button>
-            <a href="{% url 'task-list' %}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Volver al listado
-            </a>
+            <a href="{% url 'task-list' %}" class="btn btn-secondary">Cancelar</a>
         </div>
     </form>
 </div>
+{% endblock %}
 
-<style>
-.form-container {
-    max-width: 700px;
-    margin: 2rem auto;
-    padding: 2rem;
-    background: white;
-    border-radius: var(--radio-borde);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
-
-.task-form {
-    margin-top: 1.5rem;
-}
-
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: var(--color-texto-principal);
-}
-
-.form-label .required {
-    color: #e74c3c;
-    margin-left: 0.25rem;
-}
-
-.form-field input[type="text"],
-.form-field input[type="date"],
-.form-field select,
-.form-field textarea {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid #ddd;
-    border-radius: var(--radio-borde);
-    font-family: var(--fuente-cuerpo);
-    font-size: 1rem;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.form-field input[type="text"]:focus,
-.form-field input[type="date"]:focus,
-.form-field select:focus,
-.form-field textarea:focus {
-    outline: none;
-    border-color: var(--color-contraste-principal);
-    box-shadow: 0 0 0 3px rgba(212, 163, 115, 0.2);
-}
-
-.form-field textarea {
-    min-height: 120px;
-    resize: vertical;
-}
-
-.form-actions {
-    display: flex;
-    gap: 1rem;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #eee;
-}
-
-.btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: var(--radio-borde);
-    font-size: 1rem;
-    font-weight: 600;
-    text-decoration: none;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn i {
-    font-size: 0.9em;
-}
-
-.btn-primary {
-    background-color: var(--color-contraste-principal);
-    color: white;
-}
-
-.btn-primary:hover {
-    background-color: #c58f59;
-    transform: translateY(-2px);
-}
-
-.btn-secondary {
-    background-color: #f0f0f0;
-    color: var(--color-texto-principal);
-    height: 3rem;
-    transform: translateY(1rem);
-}
-
-.btn-secondary:hover {
-    background-color: #e0e0e0;
-    transform: translateY(0px);
-}
-
-/* Estilos para el campo de fecha */
-input[type="date"] {
-    position: relative;
-}
-
-input[type="date"]::before {
-    content: attr(placeholder);
-    color: #999;
-    position: absolute;
-    pointer-events: none;
-    left: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-}
-
-input[type="date"]:focus::before,
-input[type="date"]:valid::before {
-    display: none;
-}
-
-/* Estilos para errores */
-.invalid-feedback {
-    color: #e74c3c;
-    font-size: 0.85rem;
-    margin-top: 0.25rem;
-}
-
-.has-error .form-control {
-    border-color: #e74c3c;
-}
-
-/* Estilos responsivos */
-@media (max-width: 768px) {
-    .form-container {
-        padding: 1.5rem;
-        margin: 1rem;
-    }
-    
-    .form-actions {
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-    
-    .btn {
-        width: 100%;
-        justify-content: center;
-    }
-}
-
-/* Estilos para campos de horario */
-.checkbox-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 0;
-}
-
-.form-checkbox {
-    width: auto;
-    margin: 0;
-    transform: scale(1.2);
-}
-
-.checkbox-label {
-    display: flex;
-    align-items: center;
-    font-weight: 600;
-    color: var(--color-texto-principal);
-    cursor: pointer;
-    margin: 0;
-}
-
-.schedule-field {
-    border-left: 3px solid var(--color-contraste-principal);
-    background-color: #f8f9fa;
-}
-
-.schedule-field:focus {
-    border-left-color: var(--color-contraste-principal);
-    background-color: white;
-}
-
-/* Animación para mostrar/ocultar campos */
-.form-group {
-    transition: all 0.3s ease-in-out;
-}
-
-.form-group[style*="display: none"] {
-    opacity: 0;
-    transform: translateY(-10px);
-}
-
-.form-group:not([style*="display: none"]) {
-    opacity: 1;
-    transform: translateY(0);
-}
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const checkbox = document.getElementById('id_agregar_al_horario');
-    const scheduleFields = document.querySelectorAll('.schedule-field');
-    
-    function toggleScheduleFields() {
-        const isChecked = checkbox.checked;
-        scheduleFields.forEach(field => {
-            const formGroup = field.closest('.form-group');
-            if (formGroup) {
-                formGroup.style.display = isChecked ? 'block' : 'none';
-                if (!isChecked) {
-                    // Limpiar campos cuando se desmarca
-                    if (field.tagName === 'SELECT') {
-                        field.selectedIndex = 0;
-                    } else {
-                        field.value = '';
-                    }
-                }
-            }
-        });
-    }
-    
-    // Ejecutar al cargar la página
-    toggleScheduleFields();
-    
-    // Ejecutar cuando cambie el checkbox
-    checkbox.addEventListener('change', toggleScheduleFields);
-});
-</script>
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'js/task_form.js' %}"></script>
 {% endblock %}
