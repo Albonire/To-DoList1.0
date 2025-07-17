@@ -101,7 +101,7 @@ small, .text-secondary { font-size: 0.9rem; color: var(--text-secondary); }
 /* --- BARRA DE NAVEGACIÓN --- */
 .main-nav {
     position: sticky; top: 0; height: 60px;
-    background-color: rgba(251, 251, 253, 0.8);
+    background-color: rgba(251, 251, 253, 0.75);
     backdrop-filter: saturate(180%) blur(20px);
     -webkit-backdrop-filter: saturate(180%) blur(20px);
     border-bottom: 1px solid var(--border-color);
@@ -109,7 +109,7 @@ small, .text-secondary { font-size: 0.9rem; color: var(--text-secondary); }
     padding: 0 2rem; z-index: 100;
     transition: background-color 0.3s ease, border-color 0.3s ease;
 }
-body.dark-theme .main-nav { background-color: rgba(28, 28, 30, 0.75); }
+body.dark-theme .main-nav { background-color: rgba(28, 28, 30, 0.7); }
 .nav-links a { font-size: 1rem; font-weight: 600; color: var(--text-primary); text-decoration: none; margin-right: 1.5rem; transition: color 0.2s ease; }
 .nav-links a:hover { color: var(--accent-primary); }
 .nav-actions { display: flex; align-items: center; gap: 1rem; }
