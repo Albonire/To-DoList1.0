@@ -1,38 +1,38 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from .models import Task
-from datetime import date, datetime, timedelta
-from django.core.exceptions import ValidationError
+from datetime import date, time
 
 # Create your tests here.
 
 class TaskModelTest(TestCase):
     def setUp(self):
+        """Set up a user for the tests."""
         self.user = User.objects.create_user(username='testuser', password='12345')
 
     def test_creacion_tarea_valida(self):
+        """Test that a valid task can be created."""
         tarea = Task.objects.create(
             nombre='Tarea de prueba',
-            descripcion='Descripción',
+            descripcion='Descripción de la tarea.',
             fecha_vencimiento=date.today(),
-            fecha_hora_inicio=datetime.now(),
-            fecha_hora_vencimiento=datetime.now() + timedelta(hours=1),
             estado='pendiente',
             prioridad='media',
-            usuario=self.user
+            usuario=self.user,
+            dia_semana='Monday',
+            hora_inicio=time(9, 0),
+            duracion_minutos=60
         )
         self.assertEqual(str(tarea), 'Tarea de prueba')
+        self.assertEqual(tarea.usuario, self.user)
+        self.assertEqual(Task.objects.count(), 1)
 
-    def test_fecha_inicio_posterior_a_vencimiento(self):
-        tarea = Task(
-            nombre='Tarea inválida',
-            descripcion='Descripción',
+    def test_str_representation(self):
+        """Test the string representation of the Task model."""
+        tarea = Task.objects.create(
+            nombre='Mi Tarea Especial',
+            descripcion='Descripción.',
             fecha_vencimiento=date.today(),
-            fecha_hora_inicio=datetime.now() + timedelta(hours=2),
-            fecha_hora_vencimiento=datetime.now(),
-            estado='pendiente',
-            prioridad='media',
             usuario=self.user
         )
-        with self.assertRaises(ValidationError):
-            tarea.clean()
+        self.assertEqual(str(tarea), 'Mi Tarea Especial')
