@@ -112,7 +112,22 @@ small, .text-secondary { font-size: 0.9rem; color: var(--text-secondary); }
 body.dark-theme .main-nav { background-color: rgba(28, 28, 30, 0.35); }
 .nav-links a { font-size: 1rem; font-weight: 600; color: var(--text-primary); text-decoration: none; margin-right: 1.5rem; transition: color 0.2s ease; }
 .nav-links a:hover { color: var(--accent-primary); }
-.nav-actions { display: flex; align-items: center; gap: 0.75rem; }
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.nav-username {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    padding-right: 0.25rem; /* Pequeño espacio extra */
+}
+/* Hace que el botón dentro del formulario sea un elemento flex directo para una alineación perfecta */
+.nav-actions form {
+    display: contents;
+}
 
 /* --- BOTONES --- */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 0.9rem; font-weight: 600; padding: 0.5rem 1.25rem; border-radius: 20px; border: 1px solid transparent; cursor: pointer; text-decoration: none; transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; -webkit-tap-highlight-color: transparent; }
@@ -125,12 +140,49 @@ body.dark-theme .main-nav { background-color: rgba(28, 28, 30, 0.35); }
 .btn-danger:hover { background-color: color-mix(in srgb, var(--accent-red) 90%, #000); }
 
 /* --- THEME SWITCHER --- */
-#theme-switcher { background: none; border: none; cursor: pointer; color: var(--text-secondary); font-size: 1.5rem; padding: 0.5rem; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; transition: color 0.2s ease, background-color 0.2s ease; }
-#theme-switcher:hover { color: var(--text-primary); background-color: var(--border-color); }
-#theme-switcher .icon-sun { display: none; }
-#theme-switcher .icon-moon { display: block; }
-body.dark-theme #theme-switcher .icon-sun { display: block; }
-body.dark-theme #theme-switcher .icon-moon { display: none; }
+#theme-switcher {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 0;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden; /* Para contener los iconos durante la transición */
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+#theme-switcher:hover {
+    color: var(--text-primary);
+    background-color: color-mix(in srgb, var(--text-primary) 15%, transparent);
+}
+.theme-icon {
+    font-size: 1.2rem;
+    position: absolute;
+    transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
+}
+.icon-sun {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+}
+.icon-moon {
+    transform: translateY(200%) rotate(180deg);
+    opacity: 0;
+}
+body.dark-theme .icon-sun {
+    transform: translateY(-200%) rotate(-180deg);
+    opacity: 0;
+}
+body.dark-theme .icon-moon {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+    /* El color amarillo se ha eliminado para usar el color secundario del tema por defecto */
+}
+
 
 /* --- FORMULARIOS (BASE) --- */
 .form-group { margin-bottom: 1.25rem; }
