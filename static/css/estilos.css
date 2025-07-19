@@ -195,7 +195,7 @@ body.dark-theme .task-card:hover { background-color: #2a2a2c; border-color: #3d3
 .task-priority, .task-status { font-size: 0.8rem; font-weight: 700; padding: 0.25rem 0.75rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
 .priority-alta { background-color: color-mix(in srgb, var(--accent-red) 20%, transparent); color: var(--accent-red); }
 .priority-media { background-color: color-mix(in srgb, #FF9500 20%, transparent); color: #FF9500; }
-.priority-baja { background-color: color-mix(in srgb, var(--accent-primary) 20%, transparent); color: var(--accent-primary); }
+.priority-baja { background-color: color-mix(in srgb, var(--accent-green) 20%, transparent); color: var(--accent-green); }
 .task-status .fas { font-size: 0.7em; margin-right: 0.5em; }
 .status-pendiente { color: #FF9500; }
 .status-en_progreso { color: var(--accent-primary); }
@@ -211,13 +211,37 @@ body.dark-theme .task-card:hover { background-color: #2a2a2c; border-color: #3d3
 /* --- VISTA DE HORARIO (SCHEDULE) --- */
 #quote-container { text-align: center; margin: 0 auto 2rem; max-width: 600px; padding: 1rem; background-color: var(--surface-color); border-radius: 12px; border: 1px solid var(--border-color); }
 #quote-text { font-style: italic; margin: 0; }
-.schedule-container { width: 100%; background-color: var(--surface-color); border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--card-shadow); }
-.schedule-table { width: 100%; border-collapse: collapse; min-width: 800px; }
-.schedule-table th, .schedule-table td { border: 1px solid var(--border-color); padding: 0.75rem; text-align: center; vertical-align: top; font-size: 0.9rem; min-height: 80px; position: relative; }
+.schedule-container { width: 100%; background-color: var(--surface-color); border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--card-shadow); overflow-x: auto; }
+.schedule-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.schedule-table th, .schedule-table td { border: 1px solid var(--border-color); padding: 0.75rem; text-align: center; vertical-align: top; font-size: 0.9rem; }
 .schedule-table th { background-color: var(--surface-color); font-weight: 600; position: sticky; top: 0; z-index: 10; }
-.schedule-table td { cursor: pointer; transition: background-color 0.2s ease; }
+.schedule-table td { height: 80px; cursor: pointer; transition: background-color 0.2s ease; }
 .schedule-table td:hover { background-color: color-mix(in srgb, var(--accent-primary) 5%, transparent); }
-.schedule-table th:first-child, .schedule-table td:first-child { font-weight: 600; background-color: var(--surface-color); position: sticky; left: 0; z-index: 5; min-width: 100px; }
+
+/* --- Anchos de Columna --- */
+.schedule-table th:first-child, .schedule-table td:first-child {
+    width: 80px; /* Ancho fijo para la columna de la hora */
+    font-weight: 600;
+    background-color: var(--surface-color);
+    position: sticky;
+    left: 0;
+    z-index: 5;
+}
+.schedule-table th:not(:first-child) {
+    width: 13.1%; /* Ancho distribuido para los 7 días */
+}
+
+/* --- Estilos para diferenciar el fin de semana --- */
+.schedule-table .weekend-col {
+    background-color: #f7f7f9; /* Un gris muy claro y distinto para el tema claro */
+}
+body.dark-theme .schedule-table .weekend-col {
+    background-color: #18181a; /* Un tono oscuro ligeramente diferente para el tema oscuro */
+}
+.schedule-table td.weekend-col:hover {
+    background-color: color-mix(in srgb, var(--accent-primary) 10%, transparent);
+}
+
 .current-time-slot { background-color: color-mix(in srgb, var(--accent-red) 10%, transparent) !important; }
 .current-time-indicator { position: absolute; left: 0; right: 0; height: 2px; background-color: var(--accent-red); z-index: 2; box-shadow: 0 0 5px var(--accent-red); }
 .activity-cell { padding: 0.5rem; border-radius: 8px; color: var(--text-primary); font-weight: 600; height: 100%; }
