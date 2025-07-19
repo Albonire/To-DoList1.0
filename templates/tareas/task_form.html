@@ -19,7 +19,12 @@
                     </div>
                 {% else %}
                     <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                    {% render_field field class="form-control" %}
+                    {# Renderiza el campo de hora con ambas clases para que el JS lo encuentre #}
+                    {% if field.name == 'hora_inicio' %}
+                        {% render_field field class="form-control time-picker-input" %}
+                    {% else %}
+                        {% render_field field class="form-control" %}
+                    {% endif %}
                 {% endif %}
                 
                 {% if field.help_text %}

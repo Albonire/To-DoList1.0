@@ -8,6 +8,7 @@
     
     <!-- Fuentes y Estilos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
 
 </head>
@@ -20,6 +21,7 @@
     </div>
     <div class="nav-actions">
         {% if user.is_authenticated %}
+            <span class="nav-username">Hola, {{ user.username }}</span>
             <form action="{% url 'logout' %}" method="post" class="inline">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-secondary">Cerrar sesión</button>
@@ -46,6 +48,7 @@
     {% block content %}{% endblock %}
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
     // Lógica para el cambio de tema
     const themeSwitcher = document.getElementById('theme-switcher');
@@ -70,6 +73,7 @@
         localStorage.setItem('theme', theme);
     });
 </script>
+<script src="{% static 'js/custom_time_picker.js' %}"></script>
 {% block scripts %}{% endblock %}
 
 </body>

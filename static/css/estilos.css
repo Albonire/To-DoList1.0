@@ -294,3 +294,39 @@ body.dark-theme .schedule-table .weekend-col {
 .alert-success { background-color: var(--accent-green); }
 .alert-error { background-color: var(--accent-red); }
 @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* --- ESTILOS PARA FLATPICKR (SELECTOR DE HORA) --- */
+.flatpickr-calendar {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: var(--card-shadow);
+    color: var(--text-primary);
+    font-family: var(--font-primary);
+}
+.flatpickr-time {
+    background-color: var(--surface-color);
+}
+.flatpickr-time .numInput {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+}
+.flatpickr-time .numInput:hover, .flatpickr-time .numInput:focus {
+    background-color: var(--surface-color);
+    border-color: var(--accent-primary);
+}
+.flatpickr-time .flatpickr-am-pm, .flatpickr-time .flatpickr-time-separator {
+    color: var(--text-secondary);
+}
+.flatpickr-time .numInputWrapper span:hover {
+    background: var(--border-color);
+}
+/* --- Flechas del selector --- */
+.flatpickr-time .arrowUp, .flatpickr-time .arrowDown {
+    fill: var(--text-secondary);
+}
+.flatpickr-time .arrowUp:hover, .flatpickr-time .arrowDown:hover {
+    fill: var(--accent-primary);
+}
