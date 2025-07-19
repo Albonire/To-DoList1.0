@@ -110,7 +110,7 @@ def toggle_task_complete(request, pk):
             task.estado = 'completada'
             message = "¡Tarea completada!"
             
-        task.save(update_fields=['estado'])
+        task.save()
         
         return JsonResponse({'success': True, 'message': message, 'estado': task.estado})
 

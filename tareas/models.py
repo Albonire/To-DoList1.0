@@ -42,6 +42,13 @@ class Task(models.Model):
     
     def __str__(self):
         return self.nombre
+
+    def save(self, *args, **kwargs):
+        # Si la tarea se marca como completada, se elimina del horario.
+        if self.estado == 'completada':
+            self.dia_semana = None
+            self.hora_inicio = None
+        super().save(*args, **kwargs)
     
 
 # Create your models here.
