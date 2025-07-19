@@ -7,7 +7,7 @@
 {% block content %}
 <div class="form-container">
     <form method="post" class="styled-form" novalidate>
-        <h1>{% if form.instance.pk %}✏️ Editar Tarea{% else %}✨ Nueva Tarea{% endif %}</h1>
+        <h1>{% if form.instance.pk %}✏️ Editar Tarea{% else %} Nueva Tarea{% endif %}</h1>
         {% csrf_token %}
 
         {% for field in form %}
