@@ -17,7 +17,8 @@ class TaskForm(forms.ModelForm):
             ),
             'hora_inicio': forms.TimeInput(
                 attrs={
-                    'type': 'time',
+                    'type': 'text',
+                    'class': 'time-picker-input',
                 },
                 format='%H:%M'
             ),
