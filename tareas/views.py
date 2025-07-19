@@ -12,11 +12,7 @@ from django.contrib import messages
 from .models import Task
 from .forms import TaskForm
 
-def json_serial(obj):
-    """JSON serializer for objects not serializable by default json code"""
-    if isinstance(obj, (datetime.datetime, datetime.date, datetime.time)):
-        return obj.isoformat()
-    raise TypeError(f"Type {type(obj)} not serializable")
+
 
 def register(request):
     if request.method == 'POST':
@@ -101,20 +97,28 @@ from django.views.decorators.http import require_POST
 @login_required
 @require_POST
 def toggle_task_complete(request, pk):
+    """
+    Cambia el estado de una tarea entre 'completada' y 'en_progreso'.
+    """
     try:
         task = Task.objects.get(pk=pk, usuario=request.user)
+        
         if task.estado == 'completada':
             task.estado = 'en_progreso'
             message = "Tarea marcada como 'En progreso'."
         else:
             task.estado = 'completada'
             message = "¡Tarea completada!"
-        task.save()
+            
+        task.save(update_fields=['estado'])
+        
         return JsonResponse({'success': True, 'message': message, 'estado': task.estado})
+
     except Task.DoesNotExist:
         return JsonResponse({'success': False, 'message': 'Tarea no encontrada o no tienes permiso para editarla.'}, status=404)
     except Exception as e:
-        return JsonResponse({'success': False, 'message': str(e)}, status=500)
+        # Captura de otros posibles errores para depuración
+        return JsonResponse({'success': False, 'message': f'Ha ocurrido un error inesperado: {e}'}, status=500)
 
 @login_required
 def schedule_view(request):

@@ -1,0 +1,11 @@
+Hola {{ user.username }},
+
+Este es un recordatorio de que tu tarea "{{ task.nombre }}" vence mañana, {{ task.fecha_vencimiento }}.
+
+Detalles de la tarea:
+- Prioridad: {{ task.get_prioridad_display }}
+- Estado: {{ task.get_estado_display }}
+
+¡No te olvides de completarla!
+
+Tu Gestor de Tareas.

@@ -30,20 +30,11 @@ class Command(BaseCommand):
             if user.email:
                 subject = f'Recordatorio de tarea: {task.nombre}'
                 
-                # Usaremos una plantilla de texto simple para el correo
-                message = f"""
-Hola {user.username},
-
-Este es un recordatorio de que tu tarea "{task.nombre}" vence mañana, {task.fecha_vencimiento}.
-
-Detalles de la tarea:
-- Prioridad: {task.get_prioridad_display()}
-- Estado: {task.get_estado_display()}
-
-¡No te olvides de completarla!
-
-Tu Gestor de Tareas.
-"""
+                # Usaremos una plantilla de Django para el correo
+                message = render_to_string('tareas/email/reminder_email.txt', {
+                    'user': user,
+                    'task': task,
+                })
 
                 try:
                     send_mail(
