@@ -18,8 +18,8 @@
             <h1>{{ task.nombre }}</h1>
             
             <div class="detail-meta">
-                <span class="task-status status-{{ task.estado|lower }}">
-                    <i class="fas fa-circle"></i> {{ task.get_estado_display }}
+                <span class="task-status status-{{ task.dynamic_status|lower }}">
+                    <i class="fas fa-circle"></i> {{ task.get_dynamic_status_display }}
                 </span>
                 <span class="task-priority priority-{{ task.prioridad|lower }}">
                     {{ task.get_prioridad_display }}

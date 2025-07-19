@@ -43,8 +43,8 @@
         <div class="task-grid">
             {% for task in tasks %}
             <div class="task-card 
-                {% if task.estado == 'completada' %}task-completed{% endif %}
-                {% if task.fecha_vencimiento < today and task.estado != 'completada' %}task-overdue{% endif %}">
+                {% if task.dynamic_status == 'completada' %}task-completed{% endif %}
+                {% if task.dynamic_status == 'vencida' %}task-overdue{% endif %}">
                 
                 <div class="task-card-header">
                     <form action="{% url 'task-toggle-complete' task.pk %}" method="post" class="task-complete-form" data-task-id="{{ task.pk }}">
@@ -62,8 +62,8 @@
                 </p>
                 
                 <div class="task-card-footer">
-                    <span class="task-status status-{{ task.estado|lower }}">
-                        <i class="fas fa-circle"></i> {{ task.get_estado_display }}
+                    <span class="task-status status-{{ task.dynamic_status|lower }}">
+                        <i class="fas fa-circle"></i> {{ task.get_dynamic_status_display }}
                     </span>
                     <span class="task-due-date text-secondary">
                         <i class="fas fa-calendar-alt"></i>

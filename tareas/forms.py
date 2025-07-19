@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ['nombre', 'descripcion', 'fecha_vencimiento', 'estado', 'prioridad', 'dia_semana', 'hora_inicio', 'duracion_minutos']
+        fields = ['nombre', 'descripcion', 'fecha_vencimiento', 'prioridad', 'dia_semana', 'hora_inicio', 'duracion_minutos']
         widgets = {
             'fecha_vencimiento': forms.DateInput(
                 attrs={

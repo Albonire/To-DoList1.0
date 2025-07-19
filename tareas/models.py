@@ -1,13 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
-from datetime import datetime, timedelta
+from datetime import date, timedelta
 
 class Task(models.Model):
     ESTADO_CHOICES = [
         ('pendiente', _('Pendiente')),
-        ('en_progreso', _('En progreso')),
         ('completada', _('Completada')),
+        ('vencida', _('Vencida')),
     ]
 
     PRIORIDAD_CHOICES = [
@@ -28,27 +28,54 @@ class Task(models.Model):
     nombre = models.CharField(max_length=200, verbose_name=_('Nombre'))
     descripcion = models.TextField(verbose_name=_('Descripción'))
     fecha_vencimiento = models.DateField(verbose_name=_('Fecha de vencimiento'))
-    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='pendiente', verbose_name=_('Estado'))
+    estado = models.CharField(max_length=20, choices=[('pendiente', _('Pendiente')), ('completada', _('Completada'))], default='pendiente', verbose_name=_('Estado'))
     prioridad = models.CharField(max_length=10, choices=PRIORIDAD_CHOICES, default='media', verbose_name=_('Prioridad'))
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_('Usuario'))
     
-    # Campos para integración con horario
+    # Campos activos para integración con horario
     dia_semana = models.CharField(max_length=10, choices=DAYS_OF_WEEK, blank=True, null=True, verbose_name=_('Día de la semana'))
     hora_inicio = models.TimeField(blank=True, null=True, verbose_name=_('Hora de inicio'))
     duracion_minutos = models.IntegerField(default=60, verbose_name=_('Duración (minutos)'))
     
+    # --- Campos de "memoria" para restaurar el horario ---
+    scheduled_dia_semana = models.CharField(max_length=10, blank=True, null=True)
+    scheduled_hora_inicio = models.TimeField(blank=True, null=True)
+
     # Campo para notificaciones
     recordatorio_enviado = models.BooleanField(default=False, verbose_name=_('Recordatorio enviado'))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Guardamos el estado original para detectar cambios en el método save
+        self._original_estado = self.estado
+
+    @property
+    def dynamic_status(self):
+        if self.estado == 'completada':
+            return 'completada'
+        if self.fecha_vencimiento < date.today():
+            return 'vencida'
+        return 'pendiente'
+
+    def get_dynamic_status_display(self):
+        return dict(self.ESTADO_CHOICES).get(self.dynamic_status)
     
     def __str__(self):
         return self.nombre
 
     def save(self, *args, **kwargs):
-        # Si la tarea se marca como completada, se elimina del horario.
-        if self.estado == 'completada':
+        # Si se está marcando como completada
+        if self.estado == 'completada' and self._original_estado != 'completada':
+            self.scheduled_dia_semana = self.dia_semana
+            self.scheduled_hora_inicio = self.hora_inicio
             self.dia_semana = None
             self.hora_inicio = None
+        # Si se está desmarcando (volviendo a pendiente)
+        elif self.estado == 'pendiente' and self._original_estado == 'completada':
+            self.dia_semana = self.scheduled_dia_semana
+            self.hora_inicio = self.scheduled_hora_inicio
+        
         super().save(*args, **kwargs)
-    
+        # Actualizamos el estado original para la próxima vez que se guarde
+        self._original_estado = self.estado
 
-# Create your models here.

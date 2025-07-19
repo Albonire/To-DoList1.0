@@ -31,13 +31,22 @@ class TaskListView(LoginRequiredMixin, ListView):
     context_object_name = 'tasks'
 
     def get_queryset(self):
+        from datetime import date
         queryset = Task.objects.filter(usuario=self.request.user).order_by('fecha_vencimiento')
+        
         estado = self.request.GET.get('estado')
-        prioridad = self.request.GET.get('prioridad')
         if estado:
-            queryset = queryset.filter(estado=estado)
+            if estado == 'completada':
+                queryset = queryset.filter(estado='completada')
+            elif estado == 'pendiente':
+                queryset = queryset.filter(estado='pendiente', fecha_vencimiento__gte=date.today())
+            elif estado == 'vencida':
+                queryset = queryset.filter(estado='pendiente', fecha_vencimiento__lt=date.today())
+
+        prioridad = self.request.GET.get('prioridad')
         if prioridad:
             queryset = queryset.filter(prioridad=prioridad)
+            
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -98,26 +107,26 @@ from django.views.decorators.http import require_POST
 @require_POST
 def toggle_task_complete(request, pk):
     """
-    Cambia el estado de una tarea entre 'completada' y 'en_progreso'.
+    Cambia el estado de una tarea entre 'completada' y 'pendiente'.
     """
     try:
         task = Task.objects.get(pk=pk, usuario=request.user)
         
         if task.estado == 'completada':
-            task.estado = 'en_progreso'
-            message = "Tarea marcada como 'En progreso'."
+            task.estado = 'pendiente' # Vuelve a pendiente al desmarcar
+            message = "Tarea marcada como 'Pendiente'."
         else:
             task.estado = 'completada'
             message = "¡Tarea completada!"
             
         task.save()
         
-        return JsonResponse({'success': True, 'message': message, 'estado': task.estado})
+        # Devuelve el estado dinámico para que el frontend se actualice correctamente
+        return JsonResponse({'success': True, 'message': message, 'estado': task.dynamic_status})
 
     except Task.DoesNotExist:
         return JsonResponse({'success': False, 'message': 'Tarea no encontrada o no tienes permiso para editarla.'}, status=404)
     except Exception as e:
-        # Captura de otros posibles errores para depuración
         return JsonResponse({'success': False, 'message': f'Ha ocurrido un error inesperado: {e}'}, status=500)
 
 @login_required

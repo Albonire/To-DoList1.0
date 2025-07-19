@@ -249,12 +249,14 @@ body.dark-theme .task-card:hover { background-color: #2a2a2c; border-color: #3d3
 .priority-media { background-color: color-mix(in srgb, #FF9500 20%, transparent); color: #FF9500; }
 .priority-baja { background-color: color-mix(in srgb, var(--accent-green) 20%, transparent); color: var(--accent-green); }
 .task-status .fas { font-size: 0.7em; margin-right: 0.5em; }
-.status-pendiente { color: #FF9500; }
-.status-en_progreso { color: var(--accent-primary); }
-.status-completada { color: var(--accent-green); }
+/* Nuevos colores para los estados dinámicos */
+.status-pendiente { color: var(--accent-primary); } /* Azul para tareas futuras */
+.status-vencida { color: #FF9500; } /* Naranja/ámbar para tareas vencidas */
+.status-completada { color: var(--accent-green); } /* Verde para tareas completadas */
+
 .task-card.task-completed { opacity: 0.6; }
 .task-card.task-completed .task-title a { text-decoration: line-through; color: var(--text-secondary); }
-.task-card.task-overdue { border-left: 4px solid var(--accent-red); }
+.task-card.task-overdue { border-left: 4px solid #FF9500; }
 
 /* --- ESTADO VACÍO --- */
 .empty-state { text-align: center; padding: 4rem 2rem; background-color: var(--surface-color); border-radius: 12px; border: 1px solid var(--border-color); max-width: 900px; margin-left: auto; margin-right: auto; }
