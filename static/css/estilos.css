@@ -255,6 +255,28 @@ body.dark-theme select.form-control { background-image: url("data:image/svg+xml,
 .form-checkbox:checked::after { content: ''; display: block; position: absolute; top: 50%; left: 50%; width: 5px; height: 10px; border: solid white; border-width: 0 2px 2px 0; transform: translate(-50%, -60%) rotate(45deg); }
 .checkbox-group label { margin: 0; font-weight: 600; }
 
+/* Estilos para el grupo de checkboxes múltiples */
+.checkbox-multiple-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background-color: var(--bg-color);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+.checkbox-multiple-group .checkbox-group {
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+}
+.checkbox-multiple-group .checkbox-group:hover {
+    background-color: color-mix(in srgb, var(--text-primary) 5%, transparent);
+}
+.checkbox-multiple-group .checkbox-group label {
+    font-weight: normal;
+}
+
 /* --- CONTENEDORES DE FORMULARIOS --- */
 .auth-container { display: flex; align-items: center; justify-content: center; padding: 2rem 0; }
 .auth-card { width: 100%; max-width: 420px; }

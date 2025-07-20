@@ -39,6 +39,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 2. Colocar las tareas en la parrilla
         tasks.forEach(task => {
+            if (!task.hora_inicio || !task.dia_semana || !Array.isArray(task.dia_semana)) {
+                return; // Ignorar si faltan datos clave
+            }
+
             const [startHour, startMinute] = task.hora_inicio.split(':').map(Number);
             
             // Ignorar tareas fuera del rango de horas visible
@@ -46,32 +50,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            const startCell = document.getElementById(`cell-${task.dia_semana}-${startHour}`);
-            if (!startCell) return;
+            // Iterar sobre cada día que la tarea tiene asignado
+            task.dia_semana.forEach(day => {
+                const startCell = document.getElementById(`cell-${day}-${startHour}`);
+                if (!startCell) return;
 
-            // Calcular rowspan (asumiendo slots de 1 hora)
-            const durationHours = Math.ceil(task.duracion_minutos / 60);
-            if (durationHours > 1) {
-                startCell.rowSpan = durationHours;
-            }
-
-            // Ocultar las celdas que quedan debajo de la tarea
-            for (let i = 1; i < durationHours; i++) {
-                const hourToDelete = startHour + i;
-                const cellToDelete = document.getElementById(`cell-${task.dia_semana}-${hourToDelete}`);
-                if (cellToDelete) {
-                    cellToDelete.remove();
+                // Calcular rowspan (asumiendo slots de 1 hora)
+                const durationHours = Math.ceil(task.duracion_minutos / 60);
+                if (durationHours > 1) {
+                    startCell.rowSpan = durationHours;
                 }
-            }
 
-            // Añadir contenido a la celda
-            startCell.classList.add('activity-cell', 'activity-study'); // Clase genérica por ahora
-            startCell.innerHTML = `
-                <div class="font-semibold">${task.nombre}</div>
-                <div class="text-xs text-secondary">${task.descripcion.substring(0, 50)}...</div>
-            `;
-            // Aquí podrías añadir un enlace al detalle de la tarea si lo deseas
-            // startCell.onclick = () => window.location.href = `/task/${task.id}/`;
+                // Ocultar las celdas que quedan debajo de la tarea
+                for (let i = 1; i < durationHours; i++) {
+                    const hourToDelete = startHour + i;
+                    const cellToDelete = document.getElementById(`cell-${day}-${hourToDelete}`);
+                    if (cellToDelete) {
+                        cellToDelete.remove();
+                    }
+                }
+
+                // Añadir contenido a la celda
+                startCell.classList.add('activity-cell', `priority-${task.prioridad.toLowerCase()}`);
+                startCell.innerHTML = `
+                    <div class="font-semibold">${task.nombre}</div>
+                    <div class="text-xs text-secondary">${task.descripcion ? task.descripcion.substring(0, 50) + '...' : ''}</div>
+                `;
+                // Añadir enlace al detalle de la tarea
+                startCell.style.cursor = 'pointer';
+                startCell.onclick = () => window.location.href = `/task/${task.id}/`;
+            });
         });
     }
 

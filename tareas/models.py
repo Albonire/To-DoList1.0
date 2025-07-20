@@ -33,12 +33,12 @@ class Task(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_('Usuario'))
     
     # Campos activos para integración con horario
-    dia_semana = models.CharField(max_length=10, choices=DAYS_OF_WEEK, blank=True, null=True, verbose_name=_('Día de la semana'))
+    dia_semana = models.JSONField(default=list, blank=True, verbose_name=_('Días de la semana'))
     hora_inicio = models.TimeField(blank=True, null=True, verbose_name=_('Hora de inicio'))
     duracion_minutos = models.IntegerField(default=60, verbose_name=_('Duración (minutos)'))
     
     # --- Campos de "memoria" para restaurar el horario ---
-    scheduled_dia_semana = models.CharField(max_length=10, blank=True, null=True)
+    scheduled_dia_semana = models.JSONField(default=list, blank=True, null=True)
     scheduled_hora_inicio = models.TimeField(blank=True, null=True)
 
     # Campo para notificaciones

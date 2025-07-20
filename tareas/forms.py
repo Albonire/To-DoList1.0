@@ -1,10 +1,18 @@
 from django import forms
-from .models import Task
+from .models import Task, Task
 from django.core.exceptions import ValidationError
 from datetime import date, timedelta
 from django.utils.translation import gettext_lazy as _
 
 class TaskForm(forms.ModelForm):
+    # Definimos el campo de selección múltiple aquí para tener más control
+    dia_semana = forms.MultipleChoiceField(
+        choices=Task.DAYS_OF_WEEK,
+        widget=forms.CheckboxSelectMultiple,
+        label=_("Días de la semana"),
+        required=False
+    )
+
     class Meta:
         model = Task
         fields = ['nombre', 'descripcion', 'fecha_vencimiento', 'prioridad', 'dia_semana', 'hora_inicio', 'duracion_minutos']
@@ -34,7 +42,6 @@ class TaskForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['dia_semana'].required = False
         self.fields['hora_inicio'].required = False
         self.fields['duracion_minutos'].required = False
 
@@ -48,15 +55,15 @@ class TaskForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        dia_semana = cleaned_data.get('dia_semana')
+        dias_semana = cleaned_data.get('dia_semana')
         hora_inicio = cleaned_data.get('hora_inicio')
         
-        # Si se especifica un día, la hora también es requerida.
-        if dia_semana and not hora_inicio:
-            self.add_error('hora_inicio', _('Debe especificar una hora de inicio si selecciona un día.'))
+        # Si se especifica al menos un día, la hora también es requerida.
+        if dias_semana and not hora_inicio:
+            self.add_error('hora_inicio', _('Debe especificar una hora de inicio si selecciona uno o más días.'))
         
-        # Si se especifica una hora, el día también es requerido.
-        if hora_inicio and not dia_semana:
-            self.add_error('dia_semana', _('Debe seleccionar un día si especifica una hora.'))
+        # Si se especifica una hora, al menos un día también es requerido.
+        if hora_inicio and not dias_semana:
+            self.add_error('dia_semana', _('Debe seleccionar al menos un día si especifica una hora.'))
             
         return cleaned_data
