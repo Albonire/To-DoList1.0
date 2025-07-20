@@ -231,6 +231,9 @@ body.dark-theme select.form-control { background-image: url("data:image/svg+xml,
 /* --- TARJETA DE TAREA --- */
 .task-card { background-color: var(--surface-color); border-radius: 12px; padding: 1.5rem; border: 1px solid var(--border-color); box-shadow: var(--card-shadow); transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease; display: flex; flex-direction: column; justify-content: space-between; }
 .task-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); }
+.task-card:hover .task-title a {
+    color: var(--accent-primary);
+}
 body.dark-theme .task-card:hover { background-color: #2a2a2c; border-color: #3d3d3f; box-shadow: none; }
 .task-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; position: relative; }
 .task-complete-form { position: absolute; top: 0; left: 0; z-index: 1; }

@@ -49,7 +49,7 @@
                 <div class="task-card-header">
                     <form action="{% url 'task-toggle-complete' task.pk %}" method="post" class="task-complete-form" data-task-id="{{ task.pk }}">
                         {% csrf_token %}
-                        <input type="checkbox" class="task-complete-checkbox" {% if task.estado == 'completada' %}checked{% endif %}>
+                        <input type="checkbox" class="task-complete-checkbox" {% if task.estado == 'completada' %}checked{% endif %} aria-label="Marcar tarea '{{ task.nombre }}' como completada">
                     </form>
                     <h2 class="task-title">
                         <a href="{% url 'task-detail' task.pk %}">{{ task.nombre }}</a>
@@ -89,4 +89,5 @@
 {% block scripts %}
 {{ block.super }}
 <script src="{% static 'js/quick_complete.js' %}"></script>
+<script src="{% static 'js/card_handler.js' %}"></script>
 {% endblock %}
