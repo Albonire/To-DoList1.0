@@ -102,6 +102,16 @@ h2, .h2 { font-size: 1.5rem; font-weight: 600; line-height: 1.3; color: var(--te
 p { margin-bottom: 1rem; font-size: 1rem; }
 small, .text-secondary { font-size: 0.9rem; color: var(--text-secondary); }
 
+.page-greeting {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+}
+.page-header h1 {
+    margin-bottom: 0; /* Remove margin from h1 inside page-header */
+}
+
 /* --- BARRA DE NAVEGACIÓN --- */
 .main-nav {
     position: sticky; top: 0; height: 60px;

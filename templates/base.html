@@ -28,7 +28,6 @@
         </div>
         <div class="nav-actions">
             {% if user.is_authenticated %}
-                <span class="nav-username">{{ greeting }}, {{ user.username }}</span>
                 <form action="{% url 'logout' %}" method="post" class="inline">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-secondary">Cerrar sesión</button>
