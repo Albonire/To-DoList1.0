@@ -1,19 +1,30 @@
-from datetime import datetime
+from datetime import datetime, date
+from .models import Task
 
 def greeting_context_processor(request):
     """
-    Proporciona un saludo dinámico basado en la hora del día.
+    Proporciona un saludo dinámico y un recuento de las tareas de hoy.
     """
-    greeting = "Hola"
+    context = {}
+    
+    # Saludo dinámico
     current_hour = datetime.now().hour
-
     if 5 <= current_hour < 12:
-        greeting = "Buenos días"
+        context['greeting'] = "Buenos días"
     elif 12 <= current_hour < 19:
-        greeting = "Buenas tardes"
+        context['greeting'] = "Buenas tardes"
     else:
-        greeting = "Buenas noches"
+        context['greeting'] = "Buenas noches"
         
-    return {
-        'greeting': greeting
-    }
+    # Recuento de tareas para hoy (solo para usuarios autenticados)
+    if request.user.is_authenticated:
+        tasks_today_count = Task.objects.filter(
+            usuario=request.user,
+            fecha_vencimiento=date.today(),
+            estado='pendiente'
+        ).count()
+        context['tasks_today_count'] = tasks_today_count
+    else:
+        context['tasks_today_count'] = 0
+
+    return context

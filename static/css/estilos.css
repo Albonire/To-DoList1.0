@@ -103,10 +103,19 @@ p { margin-bottom: 1rem; font-size: 1rem; }
 small, .text-secondary { font-size: 0.9rem; color: var(--text-secondary); }
 
 .page-greeting {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-weight: 600;
     color: var(--text-secondary);
     margin-bottom: 0.25rem;
+}
+.page-subgreeting {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+.page-subgreeting strong {
+    color: var(--accent-primary);
+    font-weight: 700;
 }
 .page-header h1 {
     margin-bottom: 0; /* Remove margin from h1 inside page-header */
