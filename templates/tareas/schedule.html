@@ -48,12 +48,6 @@
     </table>
 </div>
 
-<!-- Bloque de depuración -->
-<div style="margin-top: 2rem; padding: 1rem; background-color: #222; border-radius: 8px;">
-    <h3 style="color: white;">Datos JSON para depuración:</h3>
-    <pre style="color: #aaffaa; white-space: pre-wrap; word-wrap: break-word;">{{ tasks_json }}</pre>
-</div>
-
 <!-- Modal de Edición -->
 <div id="editModal" class="modal">
     <div class="modal-content">
@@ -91,9 +85,10 @@
 {% endblock %}
 
 {% block scripts %}
+{% load static %}
 {{ block.super }}
 <script id="tasks-data" type="application/json">
     {{ tasks_json|safe }}
 </script>
-<script src="{% static 'js/schedule.js' %}"></script>
+<script src="{% static 'js/schedule.js' %}?v={% now "U" %}"></script>
 {% endblock %}

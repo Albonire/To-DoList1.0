@@ -23,6 +23,7 @@ class Task(models.Model):
         ('Thursday', _('Jueves')),
         ('Friday', _('Viernes')),
         ('Saturday', _('Sábado')),
+        ('Sunday', _('Domingo')),
     ]
 
     nombre = models.CharField(max_length=200, verbose_name=_('Nombre'))
