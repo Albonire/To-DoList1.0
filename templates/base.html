@@ -15,25 +15,33 @@
 <body>
 
 <nav class="main-nav">
-    <div class="nav-links">
-        <a href="{% url 'task-list' %}">Tareas</a>
-        <a href="{% url 'schedule' %}">Horario</a>
-    </div>
-    <div class="nav-actions">
-        {% if user.is_authenticated %}
-            <span class="nav-username">Hola, {{ user.username }}</span>
-            <form action="{% url 'logout' %}" method="post" class="inline">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-secondary">Cerrar sesión</button>
-            </form>
-        {% else %}
-            <a href="/accounts/login/" class="btn btn-secondary">Iniciar sesión</a>
-            <a href="/accounts/register/" class="btn btn-primary">Registrarse</a>
-        {% endif %}
-        <button id="theme-switcher" aria-label="Cambiar tema">
-            <i class="fa-solid fa-sun theme-icon icon-sun"></i>
-            <i class="fa-solid fa-moon theme-icon icon-moon"></i>
-        </button>
+    <a href="{% url 'task-list' %}" class="nav-brand">Gestor de Tareas</a>
+    
+    <button id="mobile-menu-toggle" class="mobile-menu-toggle" aria-label="Abrir menú" aria-expanded="false">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="nav-menu" id="nav-menu">
+        <div class="nav-links">
+            <a href="{% url 'task-list' %}" class="{% if request.resolver_match.url_name == 'task-list' %}active{% endif %}">Tareas</a>
+            <a href="{% url 'schedule' %}" class="{% if request.resolver_match.url_name == 'schedule' %}active{% endif %}">Horario</a>
+        </div>
+        <div class="nav-actions">
+            {% if user.is_authenticated %}
+                <span class="nav-username">{{ greeting }}, {{ user.username }}</span>
+                <form action="{% url 'logout' %}" method="post" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-secondary">Cerrar sesión</button>
+                </form>
+            {% else %}
+                <a href="/accounts/login/" class="btn btn-secondary">Iniciar sesión</a>
+                <a href="/accounts/register/" class="btn btn-primary">Registrarse</a>
+            {% endif %}
+            <button id="theme-switcher" aria-label="Cambiar tema">
+                <i class="fa-solid fa-sun theme-icon icon-sun"></i>
+                <i class="fa-solid fa-moon theme-icon icon-moon"></i>
+            </button>
+        </div>
     </div>
 </nav>
 
@@ -50,7 +58,19 @@
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
-    // Lógica para el cambio de tema
+    // --- Lógica para el menú móvil ---
+    const menuToggle = document.getElementById('mobile-menu-toggle');
+    const navMenu = document.getElementById('nav-menu');
+
+    if (menuToggle && navMenu) {
+        menuToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('is-open');
+            const isOpen = navMenu.classList.contains('is-open');
+            menuToggle.setAttribute('aria-expanded', isOpen);
+        });
+    }
+
+    // --- Lógica para el cambio de tema ---
     const themeSwitcher = document.getElementById('theme-switcher');
     const body = document.body;
 
