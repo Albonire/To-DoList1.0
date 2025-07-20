@@ -141,10 +141,10 @@ def schedule_view(request):
     ).values(
         'id',
         'nombre',
-        'descripcion',
         'dia_semana',
         'hora_inicio',
-        'duracion_minutos'
+        'duracion_minutos',
+        'prioridad'  # Pasamos la prioridad para usarla en las clases CSS
     )
 
     tasks_list = []
