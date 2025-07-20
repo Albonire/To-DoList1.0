@@ -7,6 +7,15 @@
 <div class="page-header">
     <div>
         <h2 class="page-greeting">{{ greeting }}, {{ user.username }}</h2>
+        {% if user.is_authenticated %}
+            <p class="page-subgreeting">
+                {% if tasks_today_count > 0 %}
+                    Tienes <strong>{{ tasks_today_count }}</strong> tarea{{ tasks_today_count|pluralize }} pendiente{{ tasks_today_count|pluralize }} para hoy.
+                {% else %}
+                    No tienes tareas pendientes para hoy. ¡Disfruta tu día!
+                {% endif %}
+            </p>
+        {% endif %}
         <h1>Mis Tareas</h1>
     </div>
     <a href="{% url 'task-create' %}" class="btn btn-primary">
