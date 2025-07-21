@@ -9,7 +9,10 @@
         <a href="{% url 'task-list' %}" class="back-link"><i class="fas fa-arrow-left"></i> Volver al listado</a>
         <div class="detail-actions">
             <a href="{% url 'task-update' task.pk %}" class="btn btn-secondary"><i class="fas fa-edit"></i> Editar</a>
-            <a href="{% url 'task-delete' task.pk %}" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Eliminar</a>
+            <form id="delete-form" action="{% url 'task-delete' task.pk %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="button" id="delete-button" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Eliminar</button>
+            </form>
         </div>
     </div>
 
@@ -42,4 +45,34 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteButton = document.getElementById('delete-button');
+    const deleteForm = document.getElementById('delete-form');
+
+    deleteButton.addEventListener('click', function(e) {
+        e.preventDefault(); // Evita que el formulario se envíe inmediatamente
+
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¡No podrás revertir esta acción!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, ¡eliminar!',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Si el usuario confirma, se envía el formulario
+                deleteForm.submit();
+            }
+        });
+    });
+});
+</script>
 {% endblock %}
