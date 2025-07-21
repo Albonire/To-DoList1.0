@@ -94,6 +94,13 @@
 
     // --- Lógica para notificaciones con SweetAlert2 ---
     document.addEventListener('DOMContentLoaded', function() {
+        // --- Lógica para la animación de los iconos del tema ---
+        // El CSS oculta los iconos hasta que tengan la clase 'loaded' para evitar un "flash".
+        const themeIcons = document.querySelectorAll('.theme-icon');
+        themeIcons.forEach(icon => {
+            icon.classList.add('loaded');
+        });
+
         const Toast = Swal.mixin({
             toast: true,
             position: 'top-end',
