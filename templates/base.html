@@ -10,6 +10,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+    <link rel="stylesheet" href="{% static 'css/custom_sweetalert.css' %}">
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </head>
 <body>
@@ -45,13 +49,6 @@
 </nav>
 
 <main class="container">
-    {% if messages %}
-        <div class="messages-container">
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-            {% endfor %}
-        </div>
-    {% endif %}
     {% block content %}{% endblock %}
 </main>
 
@@ -90,6 +87,30 @@
             theme = 'dark-theme';
         }
         localStorage.setItem('theme', theme);
+    });
+
+    // --- Lógica para notificaciones con SweetAlert2 ---
+    document.addEventListener('DOMContentLoaded', function() {
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer);
+                toast.addEventListener('mouseleave', Swal.resumeTimer);
+            }
+        });
+
+        {% if messages %}
+            {% for message in messages %}
+                Toast.fire({
+                    icon: '{{ message.tags }}', // success, error, warning, info
+                    title: '{{ message }}'
+                });
+            {% endfor %}
+        {% endif %}
     });
 </script>
 <script src="{% static 'js/custom_time_picker.js' %}"></script>
