@@ -323,10 +323,23 @@ body.dark-theme .task-card:hover { background-color: #2a2a2c; border-color: #3d3
 .task-card-footer { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; color: var(--text-secondary); }
 
 /* --- ESTADOS Y PRIORIDADES --- */
-.task-priority, .task-status { font-size: 0.8rem; font-weight: 700; padding: 0.25rem 0.75rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+.task-priority { font-size: 0.8rem; font-weight: 700; padding: 0.25rem 0.75rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* Colores para las etiquetas de prioridad en las tarjetas */
 .priority-alta { background-color: color-mix(in srgb, var(--accent-red) 20%, transparent); color: var(--accent-red); }
 .priority-media { background-color: color-mix(in srgb, #FF9500 20%, transparent); color: #FF9500; }
 .priority-baja { background-color: color-mix(in srgb, var(--accent-green) 20%, transparent); color: var(--accent-green); }
+
+/* Colores de fondo para las celdas de tarea en el horario */
+td.priority-alta { background-color: color-mix(in srgb, var(--accent-red) 25%, var(--surface-color)); border-left: 4px solid var(--accent-red); }
+td.priority-media { background-color: color-mix(in srgb, #FF9500 25%, var(--surface-color)); border-left: 4px solid #FF9500; }
+td.priority-baja { background-color: color-mix(in srgb, var(--accent-green) 25%, var(--surface-color)); border-left: 4px solid var(--accent-green); }
+
+/* Asegurar que el texto dentro de las celdas de tarea sea legible */
+td.priority-alta div, td.priority-media div, td.priority-baja div {
+    color: var(--text-primary);
+}
+
 .task-status .fas { font-size: 0.7em; margin-right: 0.5em; }
 /* Nuevos colores para los estados dinámicos */
 .status-pendiente { color: var(--accent-primary); } /* Azul para tareas futuras */
@@ -371,6 +384,12 @@ body.dark-theme .task-card:hover { background-color: #2a2a2c; border-color: #3d3
 body.dark-theme .schedule-table .weekend-col {
     background-color: #18181a; /* Un tono oscuro ligeramente diferente para el tema oscuro */
 }
+
+/* --- Anulación para celdas de fin de semana que contienen una tarea --- */
+.schedule-table .weekend-col:has(.activity-cell) {
+    background-color: transparent !important; /* Anula el color de fondo si hay una tarea */
+}
+
 .schedule-table td.weekend-col:hover {
     background-color: color-mix(in srgb, var(--accent-primary) 10%, transparent);
 }
@@ -379,14 +398,14 @@ body.dark-theme .schedule-table .weekend-col {
 .current-time-indicator { position: absolute; left: 0; right: 0; height: 2px; background-color: var(--accent-red); z-index: 2; box-shadow: 0 0 5px var(--accent-red); }
 .activity-cell { padding: 0.5rem; border-radius: 8px; color: var(--text-primary); font-weight: 600; height: 100%; }
 .activity-cell .icon { margin-right: 0.5em; }
-.activity-class { background-color: color-mix(in srgb, #007AFF 15%, transparent); border-left: 3px solid #007AFF; }
-.activity-study { background-color: color-mix(in srgb, #34C759 15%, transparent); border-left: 3px solid #34C759; }
-.activity-workout { background-color: color-mix(in srgb, #FF9500 15%, transparent); border-left: 3px solid #FF9500; }
-.activity-meal { background-color: color-mix(in srgb, #AF52DE 15%, transparent); border-left: 3px solid #AF52DE; }
-.activity-routine { background-color: color-mix(in srgb, #5856D6 15%, transparent); border-left: 3px solid #5856D6; }
-.activity-break { background-color: color-mix(in srgb, #5AC8FA 15%, transparent); border-left: 3px solid #5AC8FA; }
+.activity-class { background-color: color-mix(in srgb, var(--accent-primary) 15%, var(--surface-color)); border-left: 3px solid var(--accent-primary); }
+.activity-study { background-color: color-mix(in srgb, var(--accent-green) 15%, var(--surface-color)); border-left: 3px solid var(--accent-green); }
+.activity-workout { background-color: color-mix(in srgb, #FF9500 15%, var(--surface-color)); border-left: 3px solid #FF9500; }
+.activity-meal { background-color: color-mix(in srgb, #AF52DE 15%, var(--surface-color)); border-left: 3px solid #AF52DE; }
+.activity-routine { background-color: color-mix(in srgb, #5856D6 15%, var(--surface-color)); border-left: 3px solid #5856D6; }
+.activity-break { background-color: color-mix(in srgb, #5AC8FA 15%, var(--surface-color)); border-left: 3px solid #5AC8FA; }
 .activity-open { background-color: transparent; }
-.activity-other { background-color: color-mix(in srgb, var(--text-secondary) 15%, transparent); border-left: 3px solid var(--text-secondary); }
+.activity-other { background-color: color-mix(in srgb, var(--text-secondary) 15%, var(--surface-color)); border-left: 3px solid var(--text-secondary); }
 .note-indicator { position: absolute; top: 5px; right: 5px; width: 8px; height: 8px; background-color: var(--accent-primary); border-radius: 50%; }
 
 @media (max-width: 1024px) { .schedule-container { overflow-x: auto; } }
