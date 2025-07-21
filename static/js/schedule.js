@@ -70,7 +70,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
 
-                // Añadir contenido a la celda
+                // Si la celda es de fin de semana, eliminamos la clase para que no interfiera
+                if (startCell.classList.contains('weekend-col')) {
+                    startCell.classList.remove('weekend-col');
+                }
+
+                // Añadir contenido y clases de estilo a la celda
                 startCell.classList.add('activity-cell', `priority-${task.prioridad.toLowerCase()}`);
                 startCell.innerHTML = `
                     <div class="font-semibold">${task.nombre}</div>
