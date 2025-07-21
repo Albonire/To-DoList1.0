@@ -34,7 +34,7 @@ class Task(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_('Usuario'))
     
     # Campos activos para integración con horario
-    dia_semana = models.JSONField(default=list, blank=True, verbose_name=_('Días de la semana'))
+    dia_semana = models.JSONField(default=list, blank=True, null=True, verbose_name=_('Días de la semana'))
     hora_inicio = models.TimeField(blank=True, null=True, verbose_name=_('Hora de inicio'))
     duracion_minutos = models.IntegerField(default=60, verbose_name=_('Duración (minutos)'))
     
