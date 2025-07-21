@@ -16,6 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from tareas import views as tareas_views
 
 urlpatterns = [
@@ -24,3 +26,6 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('', include('tareas.urls')),
 ]
+
+if settings.DEBUG:
+    urlpatterns += staticfiles_urlpatterns()
