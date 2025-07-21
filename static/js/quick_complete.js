@@ -1,6 +1,19 @@
 document.addEventListener('DOMContentLoaded', function() {
     const checkboxes = document.querySelectorAll('.task-complete-checkbox');
 
+    // Configuración del Toast de SweetAlert2
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer);
+            toast.addEventListener('mouseleave', Swal.resumeTimer);
+        }
+    });
+
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', function() {
             const form = this.closest('.task-complete-form');
@@ -21,24 +34,33 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Update UI
+                    // Actualizar UI
                     if (data.estado === 'completada') {
                         taskCard.classList.add('task-completed');
                     } else {
                         taskCard.classList.remove('task-completed');
                     }
-                    // Show a temporary notification (you might need a dedicated notification system)
-                    alert(data.message); 
+                    // Mostrar notificación con SweetAlert2
+                    Toast.fire({
+                        icon: 'success',
+                        title: data.message
+                    });
                 } else {
-                    // Revert checkbox state if there was an error
+                    // Revertir el estado del checkbox si hay un error
                     this.checked = !isCompleted;
-                    alert('Error: ' + data.message);
+                    Toast.fire({
+                        icon: 'error',
+                        title: data.message
+                    });
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                this.checked = !isCompleted; // Revert checkbox on network error
-                alert('Ocurrió un error al actualizar la tarea.');
+                this.checked = !isCompleted; // Revertir en caso de error de red
+                Toast.fire({
+                    icon: 'error',
+                    title: 'Ocurrió un error al actualizar la tarea.'
+                });
             });
         });
     });
