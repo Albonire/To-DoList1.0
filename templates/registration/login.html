@@ -1,41 +1,39 @@
-{% extends "base.html" %}
-{% load static %}
+{% extends "registration/base_auth.html" %}
 {% load widget_tweaks %}
 
 {% block title %}Iniciar Sesión - {{ block.super }}{% endblock %}
 
-{% block content %}
-<div class="auth-container">
-    <div class="auth-card">
-        <form method="post" class="styled-form auth-form" novalidate>
-            <h1>Iniciar Sesión</h1>
-            {% csrf_token %}
-            
-            {% if form.non_field_errors %}
-                <div class="form-group">
-                    {% for error in form.non_field_errors %}
-                        <p class="error-text">{{ error }}</p>
-                    {% endfor %}
-                </div>
-            {% endif %}
-
+{% block auth_content %}
+<div class="auth-card">
+    <form method="post" class="styled-form auth-form" novalidate>
+        <h1>Iniciar Sesión</h1>
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
             <div class="form-group">
-                <label for="{{ form.username.id_for_label }}" class="form-label">Usuario</label>
-                {% render_field form.username class="form-control" placeholder="tu-usuario" %}
+                {% for error in form.non_field_errors %}
+                    <p class="error-text">{{ error }}</p>
+                {% endfor %}
             </div>
-            
-            <div class="form-group">
-                <label for="{{ form.password.id_for_label }}" class="form-label">Contraseña</label>
-                {% render_field form.password class="form-control" placeholder="••••••••" %}
-            </div>
+        {% endif %}
 
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Entrar</button>
-            </div>
-        </form>
-        <p class="auth-switch-link">
-            ¿No tienes una cuenta? <a href="{% url 'register' %}">Regístrate</a>
-        </p>
-    </div>
+        <div class="form-group">
+            <label for="{{ form.username.id_for_label }}" class="form-label">Usuario</label>
+            {% render_field form.username class="form-control" placeholder="tu-usuario" %}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.password.id_for_label }}" class="form-label">Contraseña</label>
+            {% render_field form.password class="form-control" placeholder="••••••••" %}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Entrar</button>
+        </div>
+    </form>
+    <p class="auth-switch-link">
+        ¿No tienes una cuenta? <a href="{% url 'register' %}">Regístrate</a>
+    </p>
 </div>
-{% endblock %}
+{% endblock auth_content %}
+
