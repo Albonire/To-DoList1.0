@@ -1,0 +1,75 @@
+/*
+  Spotlight Effect para las páginas de autenticación (Login/Register)
+  ===================================================================
+
+  Cómo funciona (Versión corregida con Máscara):
+
+  1. El `.spotlight-container` sigue siendo el contenedor principal.
+  
+  2. El pseudo-elemento `::before` se convierte en la LUZ GRANULADA.
+     - `background-image`: Se le asigna la textura de grano SVG. Esto hace que todo el pseudo-elemento sea una capa de ruido.
+     - `mask-image`: ¡LA CLAVE DE LA SOLUCIÓN! Se usa un gradiente radial como máscara. Esto "recorta" la capa de grano, haciéndola visible solo en la forma de la luz.
+     - `mask-repeat: no-repeat`: Asegura que la máscara no se repita.
+     - `transition`: Se aplica a `mask-position` para que el movimiento de la luz sea fluido.
+*/
+.spotlight-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    /* La capa está hecha de la textura granulada */
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"><filter id="grainy"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23grainy)"/></svg>');
+    
+    /* La opacidad del grano se controla aquí para que sea sutil */
+    opacity: 0.25;
+
+    /* La MÁSCARA define la forma y la posición de la luz */
+    mask-image: radial-gradient(
+        circle 380px at var(--x, 50%) var(--y, 50%),
+        black, /* El color no importa, solo el canal alfa */
+        transparent 80%
+    );
+    mask-repeat: no-repeat;
+
+    /* La transición se aplica a la posición de la máscara */
+    transition: mask-position 0.1s linear;
+    
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* 
+  Para el TEMA OSCURO, simplemente invertimos el color del grano.
+  En lugar de un grano oscuro sobre un fondo claro, necesitamos un grano claro.
+  Esto se logra cambiando el color del fondo del pseudo-elemento.
+*/
+body.dark-theme .spotlight-container::before {
+    /* El fondo es blanco, por lo que el grano SVG (que es oscuro por defecto) se invierte visualmente */
+    background-color: white;
+    opacity: 0.15; /* El grano claro puede ser más sutil */
+}
+
+/* 
+  La tarjeta del formulario se coloca en una capa superior (z-index: 1)
+  para asegurarse de que esté por encima del efecto.
+*/
+.auth-card {
+    position: relative;
+    z-index: 1;
+}
+
+/*
+  El contenedor principal que centra el formulario.
+*/
+.spotlight-container {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    overflow: hidden;
+    background-color: var(--background-color);
+    display: grid;
+    place-items: center;
+}
