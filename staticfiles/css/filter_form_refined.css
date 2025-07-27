@@ -1,0 +1,64 @@
+/*
+    filter_form_refined.css
+    Estilos sutiles para mejorar la estructura y la interacción del formulario de filtros.
+*/
+
+/* 1. Layout y Espaciado: Convierte el formulario en una barra horizontal y ordenada */
+.filter-form-refined {
+    display: flex;
+    flex-wrap: wrap; /* Permite que los elementos pasen a la siguiente línea en pantallas pequeñas */
+    align-items: flex-end; /* Alinea la parte inferior de los labels, selects y botones */
+    gap: 1rem 1.5rem; /* Espaciado consistente entre elementos */
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--toolbar-border-color, #e5e7eb); /* Usa variable si existe, si no, un color por defecto */
+}
+
+body.dark-theme .filter-form-refined {
+    border-bottom-color: var(--toolbar-border-color, #334155);
+}
+
+/* 2. Grupos de Formulario: Mantiene el label y el select juntos */
+.form-group-refined {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem; /* Espacio pequeño entre el label y el select */
+}
+
+/* 3. Etiquetas: Más ligeras para no dominar visualmente */
+.form-label-refined {
+    font-size: 0.875rem; /* Ligeramente más pequeño */
+    font-weight: 500;
+    color: var(--toolbar-text-color, #6b7280);
+}
+
+body.dark-theme .form-label-refined {
+    color: var(--toolbar-text-color, #94a3b8);
+}
+
+/* 4. Controles de Selección: Mejoras de interacción sutiles */
+.form-control-refined {
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.form-control-refined:focus {
+    border-color: var(--toolbar-focus-ring, #3b82f6);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--toolbar-focus-ring, #3b82f6) 15%, transparent);
+    outline: none;
+}
+
+/* 5. Jerarquía Visual: Empuja las acciones a la derecha */
+.filter-actions-refined {
+    margin-left: auto; /* Magia de Flexbox para alinear a la derecha */
+    display: flex;
+    gap: 0.75rem;
+}
+
+/* 6. Botones: Añade transiciones para una mejor sensación de click */
+.filter-actions-refined .btn {
+    transition: all 0.2s ease-in-out;
+}
+
+.filter-actions-refined .btn:active {
+    transform: translateY(1px); /* Efecto de "presionado" sutil */
+}
