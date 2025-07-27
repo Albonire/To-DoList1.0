@@ -1,0 +1,115 @@
+/*
+    filter_form_refined.css
+    Versión 3: Diseño de tarjeta con fondo desenfocado (blur).
+*/
+
+.filter-form-refined {
+    /* 1. Apariencia de Tarjeta Flotante */
+    background-color: rgba(251, 251, 253, 0.5); /* Color semi-transparente del tema claro */
+    backdrop-filter: saturate(180%) blur(15px);
+    -webkit-backdrop-filter: saturate(180%) blur(15px);
+    border: 1px solid var(--border-color);
+    border-radius: 16px; /* Bordes más redondeados para el look de tarjeta */
+    padding: 1rem 1.5rem; /* Espaciado interno */
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+
+    /* 2. Layout Flexbox (sin cambios) */
+    display: flex;
+    align-items: flex-end;
+    gap: 1.5rem;
+}
+
+/* Adaptación para el Tema Oscuro */
+body.dark-theme .filter-form-refined {
+    background-color: rgba(28, 28, 30, 0.5); /* Color semi-transparente del tema oscuro */
+    box-shadow: none; /* La sombra no es necesaria en el tema oscuro */
+}
+
+
+/* --- El resto de los estilos para los controles internos se mantienen --- */
+
+.filter-form-refined .form-group-refined {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.filter-form-refined .form-label-refined {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.filter-form-refined .form-control-refined {
+    display: block;
+    height: auto;
+    padding: 0.5rem 2.5rem 0.5rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--text-primary);
+    /* El fondo del select debe ser más opaco para ser legible */
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1em 1em;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.dark-theme .filter-form-refined .form-control-refined {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+}
+
+.filter-form-refined .form-control-refined:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 20%, transparent);
+}
+
+.filter-form-refined .filter-actions-refined {
+    margin-left: auto;
+    display: flex;
+    gap: 0.75rem;
+}
+
+.filter-form-refined .filter-actions-refined .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.55rem 1.25rem;
+    border-radius: 20px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.15s ease, background-color 0.2s ease;
+}
+
+.filter-form-refined .filter-actions-refined .btn:active {
+    transform: scale(0.97);
+}
+
+.filter-form-refined .filter-actions-refined .btn-primary {
+    background-color: var(--accent-primary);
+    color: #FFFFFF;
+}
+.filter-form-refined .filter-actions-refined .btn-primary:hover {
+    background-color: color-mix(in srgb, var(--accent-primary) 90%, #000);
+}
+
+.filter-form-refined .filter-actions-refined .btn-secondary {
+    background-color: color-mix(in srgb, var(--text-primary) 8%, transparent);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+.filter-form-refined .filter-actions-refined .btn-secondary:hover {
+    background-color: color-mix(in srgb, var(--text-primary) 15%, transparent);
+}
