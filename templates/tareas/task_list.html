@@ -23,29 +23,31 @@
     </a>
 </div>
 
-<!-- Filtros -->
-<form method="get" class="filter-form">
-    <div class="form-group">
-        <label for="estado" class="form-label">Filtrar por Estado</label>
-        <select name="estado" id="estado" class="form-control">
-            <option value="">Todos los estados</option>
+<!-- Filtros sutilmente refinados -->
+<form method="get" class="filter-form-refined">
+    <div class="form-group-refined">
+        <label for="estado" class="form-label-refined">Estado</label>
+        <select name="estado" id="estado" class="form-control-refined">
+            <option value="">Todos</option>
             {% for value, display in estados %}
                 <option value="{{ value }}" {% if estado_actual == value %}selected{% endif %}>{{ display }}</option>
             {% endfor %}
         </select>
     </div>
-    <div class="form-group">
-        <label for="prioridad" class="form-label">Filtrar por Prioridad</label>
-        <select name="prioridad" id="prioridad" class="form-control">
-            <option value="">Todas las prioridades</option>
+    <div class="form-group-refined">
+        <label for="prioridad" class="form-label-refined">Prioridad</label>
+        <select name="prioridad" id="prioridad" class="form-control-refined">
+            <option value="">Todas</option>
             {% for value, display in prioridades %}
                 <option value="{{ value }}" {% if prioridad_actual == value %}selected{% endif %}>{{ display }}</option>
             {% endfor %}
         </select>
     </div>
-    <div class="filter-actions">
-        <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
-        <a href="{% url 'task-list' %}" class="btn btn-secondary">Limpiar</a>
+    <div class="filter-actions-refined">
+        <button type="submit" class="btn btn-primary">Aplicar</button>
+        {% if estado_actual or prioridad_actual %}
+            <a href="{% url 'task-list' %}" class="btn btn-secondary">Limpiar</a>
+        {% endif %}
     </div>
 </form>
 
