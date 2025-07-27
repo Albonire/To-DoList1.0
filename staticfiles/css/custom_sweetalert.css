@@ -1,0 +1,89 @@
+/* --- ESTILOS PERSONALIZADOS PARA SWEETALERT2 --- */
+
+/* --- Contenedor principal del modal/toast --- */
+.swal2-popup,
+.swal2-toast {
+    background-color: var(--surface-color) !important;
+    color: var(--text-primary) !important;
+    border-radius: 16px !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: var(--card-shadow) !important;
+    font-family: var(--font-primary) !important;
+}
+
+/* --- Título --- */
+.swal2-title {
+    color: var(--text-primary) !important;
+    font-weight: 700 !important;
+}
+
+/* --- Contenido y texto --- */
+.swal2-html-container {
+    color: var(--text-secondary) !important;
+}
+
+/* --- Iconos --- */
+.swal2-icon.swal2-success .line {
+    background-color: var(--accent-green) !important;
+}
+.swal2-icon.swal2-success .placeholder {
+    border-color: var(--accent-green) !important;
+}
+.swal2-icon.swal2-error .line {
+    background-color: var(--accent-red) !important;
+}
+.swal2-icon.swal2-error {
+    border-color: var(--accent-red) !important;
+}
+.swal2-icon.swal2-warning {
+    color: #FF9500 !important;
+    border-color: #FF9500 !important;
+}
+
+/* --- Botones --- */
+.swal2-confirm,
+.swal2-cancel {
+    border-radius: 20px !important;
+    font-weight: 600 !important;
+    padding: 0.6rem 1.5rem !important;
+    transition: transform 0.2s ease, background-color 0.2s ease !important;
+    border: none !important;
+}
+.swal2-confirm:focus,
+.swal2-cancel:focus {
+    box-shadow: none !important;
+}
+.swal2-confirm:active,
+.swal2-cancel:active {
+    transform: scale(0.98);
+}
+
+/* Botón de Confirmar (generalmente el de acción principal) */
+.swal2-confirm {
+    background-color: var(--accent-primary) !important;
+}
+.swal2-confirm:hover {
+    background-color: color-mix(in srgb, var(--accent-primary) 90%, #000) !important;
+}
+
+/* Botón de Confirmar para acciones peligrosas (rojo) */
+.swal2-popup.swal2-icon-warning .swal2-confirm {
+    background-color: var(--accent-red) !important;
+}
+.swal2-popup.swal2-icon-warning .swal2-confirm:hover {
+    background-color: color-mix(in srgb, var(--accent-red) 90%, #000) !important;
+}
+
+/* Botón de Cancelar */
+.swal2-cancel {
+    background-color: color-mix(in srgb, var(--text-primary) 8%, transparent) !important;
+    color: var(--text-primary) !important;
+}
+.swal2-cancel:hover {
+    background-color: color-mix(in srgb, var(--text-primary) 15%, transparent) !important;
+}
+
+/* --- Barra de progreso del Toast --- */
+.swal2-timer-progress-bar {
+    background-color: var(--accent-primary) !important;
+}
