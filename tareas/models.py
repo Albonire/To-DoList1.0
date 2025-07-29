@@ -45,11 +45,6 @@ class Task(models.Model):
     # Campo para notificaciones
     recordatorio_enviado = models.BooleanField(default=False, verbose_name=_('Recordatorio enviado'))
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Guardamos el estado original para detectar cambios en el método save
-        self._original_estado = self.estado
-
     @property
     def dynamic_status(self):
         if self.estado == 'completada':
@@ -63,20 +58,4 @@ class Task(models.Model):
     
     def __str__(self):
         return self.nombre
-
-    def save(self, *args, **kwargs):
-        # Si se está marcando como completada
-        if self.estado == 'completada' and self._original_estado != 'completada':
-            self.scheduled_dia_semana = self.dia_semana
-            self.scheduled_hora_inicio = self.hora_inicio
-            self.dia_semana = None
-            self.hora_inicio = None
-        # Si se está desmarcando (volviendo a pendiente)
-        elif self.estado == 'pendiente' and self._original_estado == 'completada':
-            self.dia_semana = self.scheduled_dia_semana
-            self.hora_inicio = self.scheduled_hora_inicio
-        
-        super().save(*args, **kwargs)
-        # Actualizamos el estado original para la próxima vez que se guarde
-        self._original_estado = self.estado
 
