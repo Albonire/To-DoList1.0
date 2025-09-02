@@ -7,7 +7,6 @@ def greeting_context_processor(request):
     """
     context = {}
     
-    # Saludo dinámico
     current_hour = datetime.now().hour
     if 5 <= current_hour < 12:
         context['greeting'] = "Buenos días"
