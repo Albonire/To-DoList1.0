@@ -249,7 +249,6 @@ body.dark-theme .main-nav { background-color: rgba(28, 28, 30, 0.35); }
     opacity: 0;
 }
 
-/* Estado tema oscuro */
 body.dark-theme .icon-sun {
     transform: translateY(-150%) rotate(-90deg) scale(0.8);
     opacity: 0;
@@ -260,7 +259,6 @@ body.dark-theme .icon-moon {
     opacity: 1;
 }
 
-/* Animación de entrada suave */
  @keyframes iconBounce {
     0% { 
         transform: translateY(0) rotate(0deg) scale(0.8); 
@@ -276,7 +274,6 @@ body.dark-theme .icon-moon {
     }
 }
 
-/* Estados de carga para evitar flash */
 .theme-icon:not(.loaded) {
     opacity: 0;
 }
@@ -285,7 +282,6 @@ body.dark-theme .icon-moon {
     animation: iconBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
-/* Variante con efecto glow opcional */
  @media (prefers-reduced-motion: no-preference) {
     #theme-switcher:hover .icon-sun {
         filter: drop-shadow(0 0 6px color-mix(in srgb, #fbbf24 50%, transparent));
@@ -295,8 +291,6 @@ body.dark-theme .icon-moon {
         filter: drop-shadow(0 0 6px color-mix(in srgb, #60a5fa 50%, transparent));
     }
 }
-
-/* Respeta las preferencias de movimiento reducido */
  @media (prefers-reduced-motion: reduce) {
     #theme-switcher,
     .theme-icon {
@@ -330,7 +324,6 @@ body.dark-theme select.form-control { background-image: url("data:image/svg+xml,
 .form-checkbox:checked::after { content: ''; display: block; position: absolute; top: 50%; left: 50%; width: 5px; height: 10px; border: solid white; border-width: 0 2px 2px 0; transform: translate(-50%, -60%) rotate(45deg); }
 .checkbox-group label { margin: 0; font-weight: 600; }
 
-/* Estilos para el grupo de checkboxes múltiples */
 .checkbox-multiple-group {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -416,7 +409,6 @@ td.priority-alta div, td.priority-media div, td.priority-baja div {
 }
 
 .task-status .fas { font-size: 0.7em; margin-right: 0.5em; }
-/* Nuevos colores para los estados dinámicos */
 .status-pendiente { color: var(--accent-primary); } /* Azul para tareas futuras */
 .status-vencida { color: #FF9500; } /* Naranja/ámbar para tareas vencidas */
 .status-completada { color: var(--accent-green); } /* Verde para tareas completadas */
