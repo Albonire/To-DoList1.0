@@ -9,13 +9,12 @@ def greeting_context_processor(request):
     
     current_hour = datetime.now().hour
     if 5 <= current_hour < 12:
-        context['greeting'] = "Buenos días"
+        context['greeting'] = "Good morning"
     elif 12 <= current_hour < 19:
-        context['greeting'] = "Buenas tardes"
+        context['greeting'] = "Good afternoon"
     else:
-        context['greeting'] = "Buenas noches"
+        context['greeting'] = "Good evening"
         
-    # Recuento de tareas para hoy (solo para usuarios autenticados)
     if request.user.is_authenticated:
         tasks_today_count = Task.objects.filter(
             usuario=request.user,
