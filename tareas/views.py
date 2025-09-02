@@ -15,6 +15,14 @@ from .forms import TaskForm
 
 
 def register(request):
+    """
+    Handles user registration.
+
+    On GET, it displays an empty registration form.
+    On POST, it validates the submitted form. If valid, it saves the new user,
+    displays a success message, and redirects to the login page. If invalid,
+    it redisplays the form with validation errors.
+    """
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -26,11 +34,25 @@ def register(request):
     return render(request, 'registration/register.html', {'form': form})
 
 class TaskListView(LoginRequiredMixin, ListView):
+    """
+    Displays a list of tasks belonging to the logged-in user.
+    
+    This view serves as the main dashboard for the user, showing their tasks.
+    It also handles filtering of tasks based on query parameters in the URL,
+    such as status ('estado') and priority ('prioridad').
+    """
     model = Task
     template_name = 'tareas/task_list.html'
     context_object_name = 'tasks'
 
     def get_queryset(self):
+        """
+        Filters the queryset based on URL parameters.
+
+        This method ensures that users only see their own tasks and applies
+        filters for status and priority. The 'vencida' (overdue) status is
+        calculated dynamically based on the due date.
+        """
         from datetime import date
         queryset = Task.objects.filter(usuario=self.request.user).order_by('fecha_vencimiento')
         
@@ -50,6 +72,13 @@ class TaskListView(LoginRequiredMixin, ListView):
         return queryset
 
     def get_context_data(self, **kwargs):
+        """
+        Adds extra context for the template.
+
+        This provides the template with necessary data for rendering the filter
+        forms and for conditional styling, such as highlighting tasks that are
+        due soon.
+        """
         from datetime import date, timedelta
         context = super().get_context_data(**kwargs)
             
@@ -63,14 +92,26 @@ class TaskListView(LoginRequiredMixin, ListView):
         return context
 
 class TaskDetailView(LoginRequiredMixin, DetailView):
+    """
+    Displays the details of a single task.
+    
+    Ensures that a user can only view the details of a task that they own.
+    """
     model = Task
     template_name = 'tareas/task_detail.html'
     context_object_name = 'task'
 
     def get_queryset(self):
+        """Ensures that users can only access their own tasks."""
         return Task.objects.filter(usuario=self.request.user)
 
 class TaskCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+    """
+    Handles the creation of a new task.
+    
+    Displays a form for creating a task and automatically assigns the task
+    to the currently logged-in user upon successful form submission.
+    """
     model = Task
     form_class = TaskForm
     template_name = 'tareas/task_form.html'
@@ -78,10 +119,17 @@ class TaskCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     success_message = "✅ ¡Tarea creada con éxito!"
 
     def form_valid(self, form):
+        """Automatically sets the logged-in user as the task owner."""
         form.instance.usuario = self.request.user
         return super().form_valid(form)
 
 class TaskUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+    """
+    Handles the updating of an existing task.
+    
+    Users can only edit tasks that they own. Displays a success message
+    upon successful update.
+    """
     model = Task
     form_class = TaskForm
     template_name = 'tareas/task_form.html'
@@ -89,15 +137,23 @@ class TaskUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     success_message = "📝 ¡Tarea actualizada correctamente!"
 
     def get_queryset(self):
+        """Ensures that users can only edit their own tasks."""
         return Task.objects.filter(usuario=self.request.user)
 
 class TaskDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
+    """
+    Handles the deletion of a task.
+    
+    Presents a confirmation page before deleting the task. Users can only
+    delete tasks that they own.
+    """
     model = Task
     template_name = 'tareas/task_confirm_delete.html'
     success_url = reverse_lazy('task-list')
     success_message = "🗑️ ¡Tarea eliminada!"
 
     def get_queryset(self):
+        """Ensures that users can only delete their own tasks."""
         return Task.objects.filter(usuario=self.request.user)
 
 from django.http import JsonResponse
