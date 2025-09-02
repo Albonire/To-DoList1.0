@@ -409,9 +409,9 @@ td.priority-alta div, td.priority-media div, td.priority-baja div {
 }
 
 .task-status .fas { font-size: 0.7em; margin-right: 0.5em; }
-.status-pendiente { color: var(--accent-primary); } /* Azul para tareas futuras */
-.status-vencida { color: #FF9500; } /* Naranja/ámbar para tareas vencidas */
-.status-completada { color: var(--accent-green); } /* Verde para tareas completadas */
+.status-pendiente { color: var(--accent-primary); } 
+.status-vencida { color: #FF9500; } 
+.status-completada { color: var(--accent-green); } 
 
 .task-card.task-completed { opacity: 0.6; }
 .task-card.task-completed .task-title a { text-decoration: line-through; color: var(--text-secondary); }
