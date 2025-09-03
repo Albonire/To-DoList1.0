@@ -26,7 +26,7 @@
 
     mask-image: radial-gradient(
         circle 380px at var(--x, 50%) var(--y, 50%),
-        black, /* El color no importa, solo el canal alfa */
+        black, 
         transparent 80%
     );
     mask-repeat: no-repeat;
