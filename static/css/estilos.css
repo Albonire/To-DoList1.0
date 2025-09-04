@@ -19,10 +19,8 @@ img {
   height: auto;
 }
 
-/* --- FUENTES Y SISTEMA DE DISEÑO MINIMALISTA MODERNO --- */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
-/* --- VARIABLES CSS --- */
 :root {
     --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     
