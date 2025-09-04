@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
         card.style.cursor = 'pointer';
 
         card.addEventListener('click', (event) => {
-            // Do not navigate if the click was on an interactive element like the completion form, a priority badge, or any other link.
+            // Do not navigate if the click was on an interactive element like the completion form, a priority badge, or any other link
             if (event.target.closest('.task-complete-form, .task-priority, a')) {
                 return;
             }
