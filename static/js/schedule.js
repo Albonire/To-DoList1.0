@@ -9,13 +9,42 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const tasks = JSON.parse(tasksDataElement.textContent);
     const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-    const hourStart = 5;
-    const hourEnd = 22;
 
     function renderSchedule() {
-        // 1. Limpiar y crear la parrilla de horas
+        // Determine the hour range dynamically based on tasks
+        let hourStart = 5; // Default start time if no tasks exist
+        let hourEnd = 22;  // Default end time if no tasks exist
+
+        if (tasks.length > 0) {
+            let minHour = 24;
+            let maxHour = -1;
+
+            tasks.forEach(task => {
+                if (task.hora_inicio) {
+                    const [startHour] = task.hora_inicio.split(':').map(Number);
+                    const durationHours = Math.ceil(task.duracion_minutos / 60);
+                    // The last hour slot a task occupies determines the grid's end
+                    const endHourOfTask = startHour + durationHours - 1;
+
+                    if (startHour < minHour) {
+                        minHour = startHour;
+                    }
+                    if (endHourOfTask > maxHour) {
+                        maxHour = endHourOfTask;
+                    }
+                }
+            });
+
+            // If tasks with valid times were found, update the schedule's range
+            if (minHour <= 23) {
+                // Add a 1-hour buffer for better spacing and clamp values to a 24-hour day (0-23)
+                hourStart = Math.max(0, minHour - 1);
+                hourEnd = Math.min(23, maxHour + 1);
+            }
+        }
+
+        // 1. Clean the existing grid and create the new dynamic one
         scheduleBody.innerHTML = '';
-        const rows = {};
         for (let hour = hourStart; hour <= hourEnd; hour++) {
             const row = scheduleBody.insertRow();
             row.id = `time-${hour}`;
@@ -29,40 +58,40 @@ document.addEventListener('DOMContentLoaded', function() {
                 cell.dataset.day = day;
                 cell.dataset.hour = hour;
 
-                // Añadir clase para el fin de semana
                 if (day === "Saturday" || day === "Sunday") {
                     cell.classList.add('weekend-col');
                 }
             });
-            rows[hour] = row;
         }
 
-        // 2. Colocar las tareas en la parrilla
+        // 2. Place the tasks onto the newly created grid
         tasks.forEach(task => {
             if (!task.hora_inicio || !task.dia_semana || !Array.isArray(task.dia_semana)) {
-                return; // Ignorar si faltan datos clave
+                return; // Ignore tasks with incomplete data
             }
 
-            const [startHour, startMinute] = task.hora_inicio.split(':').map(Number);
-            
-            // Ignorar tareas fuera del rango de horas visible
+            const [startHour] = task.hora_inicio.split(':').map(Number);
+
+            // This check ensures we only try to place tasks that fit within our dynamic grid.
             if (startHour < hourStart || startHour > hourEnd) {
+                console.warn(`Task "${task.nombre}" at ${startHour}:00 is outside the generated schedule view and will not be displayed.`);
                 return;
             }
 
-            // Iterar sobre cada día que la tarea tiene asignado
             task.dia_semana.forEach(day => {
                 const startCell = document.getElementById(`cell-${day}-${startHour}`);
                 if (!startCell) return;
 
-                // Calcular rowspan (asumiendo slots de 1 hora)
                 const durationHours = Math.ceil(task.duracion_minutos / 60);
-                if (durationHours > 1) {
-                    startCell.rowSpan = durationHours;
+                
+                // Ensure a task's duration doesn't visually extend beyond the created grid
+                const effectiveDuration = Math.min(durationHours, hourEnd - startHour + 1);
+                if (effectiveDuration > 1) {
+                    startCell.rowSpan = effectiveDuration;
                 }
 
-                // Ocultar las celdas que quedan debajo de la tarea
-                for (let i = 1; i < durationHours; i++) {
+                // Hide the cells that are now covered by the multi-hour task
+                for (let i = 1; i < effectiveDuration; i++) {
                     const hourToDelete = startHour + i;
                     const cellToDelete = document.getElementById(`cell-${day}-${hourToDelete}`);
                     if (cellToDelete) {
@@ -70,18 +99,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
 
-                // Si la celda es de fin de semana, eliminamos la clase para que no interfiera
                 if (startCell.classList.contains('weekend-col')) {
                     startCell.classList.remove('weekend-col');
                 }
 
-                // Añadir contenido y clases de estilo a la celda
                 startCell.classList.add('activity-cell', `priority-${task.prioridad.toLowerCase()}`);
                 startCell.innerHTML = `
                     <div class="font-semibold">${task.nombre}</div>
                     <div class="text-xs text-secondary">${task.descripcion ? task.descripcion.substring(0, 50) + '...' : ''}</div>
                 `;
-                // Añadir enlace al detalle de la tarea
                 startCell.style.cursor = 'pointer';
                 startCell.onclick = () => window.location.href = `/task/${task.id}/`;
             });
