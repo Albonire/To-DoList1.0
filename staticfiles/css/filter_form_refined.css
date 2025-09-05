@@ -6,9 +6,9 @@
 /* 1. Layout y Espaciado: Convierte el formulario en una barra horizontal y ordenada */
 .filter-form-refined {
     display: flex;
-    flex-wrap: wrap; /* Permite que los elementos pasen a la siguiente línea en pantallas pequeñas */
-    align-items: flex-end; /* Alinea la parte inferior de los labels, selects y botones */
-    gap: 1rem 1.5rem; /* Espaciado consistente entre elementos */
+    flex-wrap: wrap; 
+    align-items: flex-end;
+    gap: 1rem 1.5rem;
     margin-bottom: 2rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid var(--toolbar-border-color, #e5e7eb); /* Usa variable si existe, si no, un color por defecto */
@@ -22,7 +22,7 @@ body.dark-theme .filter-form-refined {
 .form-group-refined {
     display: flex;
     flex-direction: column;
-    gap: 0.35rem; /* Espacio pequeño entre el label y el select */
+    gap: 0.35rem; 
 }
 
 /* 3. Etiquetas: Más ligeras para no dominar visualmente */
@@ -49,7 +49,7 @@ body.dark-theme .form-label-refined {
 
 /* 5. Jerarquía Visual: Empuja las acciones a la derecha */
 .filter-actions-refined {
-    margin-left: auto; /* Magia de Flexbox para alinear a la derecha */
+    margin-left: auto; 
     display: flex;
     gap: 0.75rem;
 }
